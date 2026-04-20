@@ -1,22 +1,21 @@
 /*
- * Symisc unQLite: An Embeddable NoSQL (Post Modern) Database Engine.
- * Copyright (C) 2012-2013, Symisc Systems http://unqlite.org/
- * Version 1.1.6
- * For information on licensing, redistribution of this file, and for a DISCLAIMER OF ALL WARRANTIES
- * please contact Symisc Systems via:
+ * Symisc unQLite: 一个嵌入式 NoSQL（后现代）数据库引擎。
+ * 版权所有 (C) 2012-2013, Symisc Systems http://unqlite.org/
+ * 版本 1.1.6
+ * 有关许可协议、再分发和免责声明的详细信息，请联系 Symisc Systems：
  *       legal@symisc.net
  *       licensing@symisc.net
  *       contact@symisc.net
- * or visit:
+ * 或访问：
  *      http://unqlite.org/licensing.html
  */
  /* $SymiscID: os_win.c v1.2 Win7 2012-11-10 12:10 devel <chm@symisc.net> $ */
 #ifndef UNQLITE_AMALGAMATION
 #include "unqliteInt.h"
 #endif
-/* Omit the whole layer from the build if compiling for platforms other than Windows */
+/* 如果不是为 Windows 平台编译，则从构建中省略整个层 */
 #ifdef __WINNT__
-/* This file contains code that is specific to windows. (Mostly SQLite3 source tree) */
+/* 本文件包含特定于 Windows 的代码。（主要参考 SQLite3 源代码树） */
 #include <Windows.h>
 /*
 ** Some microsoft compilers lack this definition.
@@ -48,23 +47,23 @@ struct winFile {
   const unqlite_io_methods *pMethod; /*** Must be first ***/
   unqlite_vfs *pVfs;      /* The VFS used to open this file */
   HANDLE h;               /* Handle for accessing the file */
-  sxu8 locktype;          /* Type of lock currently held on this file */
-  short sharedLockByte;   /* Randomly chosen byte used as a shared lock */
-  DWORD lastErrno;        /* The Windows errno from the last I/O error */
-  DWORD sectorSize;       /* Sector size of the device file is on */
-  int szChunk;            /* Chunk size */
+  sxu8 locktype;          /* 当前文件持有的锁类型 */
+  short sharedLockByte;   /* 随机选择的字节，用作共享锁 */
+  DWORD lastErrno;        /* 上一次 I/O 错误的 Windows errno */
+  DWORD sectorSize;       /* 文件所在设备的扇区大小 */
+  int szChunk;            /* 块大小 */
 #ifdef __WIN_CE__
-  WCHAR *zDeleteOnClose;  /* Name of file to delete when closing */
-  HANDLE hMutex;          /* Mutex used to control access to shared lock */  
-  HANDLE hShared;         /* Shared memory segment used for locking */
-  winceLock local;        /* Locks obtained by this instance of winFile */
-  winceLock *shared;      /* Global shared lock memory for the file  */
+  WCHAR *zDeleteOnClose;  /* 关闭时删除的文件名 */
+  HANDLE hMutex;          /* 用于控制共享锁访问的互斥锁 */
+  HANDLE hShared;         /* 用于锁定的共享内存段 */
+  winceLock local;        /* 此 winFile 实例获取的锁 */
+  winceLock *shared;      /* 文件的全局共享锁内存 */
 #endif
 };
 /*
-** Convert a UTF-8 string to microsoft unicode (UTF-16?). 
+** 将 UTF-8 字符串转换为 Microsoft Unicode (UTF-16?)。
 **
-** Space to hold the returned string is obtained from HeapAlloc().
+** 用于保存返回字符串的空间从 HeapAlloc() 获取。
 */
 static WCHAR *utf8ToUnicode(const char *zFilename){
   int nChar;
@@ -84,8 +83,7 @@ static WCHAR *utf8ToUnicode(const char *zFilename){
 }
 
 /*
-** Convert microsoft unicode to UTF-8.  Space to hold the returned string is
-** obtained from malloc().
+** 将 Microsoft Unicode 转换为 UTF-8。用于保存返回字符串的空间从 malloc() 获取。
 */
 static char *unicodeToUtf8(const WCHAR *zWideFilename){
   int nByte;
@@ -106,11 +104,9 @@ static char *unicodeToUtf8(const WCHAR *zWideFilename){
 }
 
 /*
-** Convert an ansi string to microsoft unicode, based on the
-** current codepage settings for file apis.
-** 
-** Space to hold the returned string is obtained
-** from malloc.
+** 基于当前文件 API 的代码页设置，将 ANSI 字符串转换为 Microsoft Unicode。
+**
+** 用于保存返回字符串的空间从 malloc 获取。
 */
 static WCHAR *mbcsToUnicode(const char *zFilename){
   int nByte;

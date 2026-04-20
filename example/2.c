@@ -1,62 +1,53 @@
 /*
- * Compile this file together with the UnQLite database engine source code
- * to generate the executable. For example: 
+ * 将此文件与 UnQLite 数据库引擎源代码一起编译以生成可执行文件。例如：
  *  gcc -W -Wall -O6 unqlite_const_intro.c unqlite.c -o unqlite_jx9_const
 */
 /*
- * This simple program is a quick introduction on how to embed and start
- * experimenting with UnQLite without having to do a lot of tedious
- * reading and configuration.
+ * 这个简单的程序是对如何嵌入和开始使用 UnQLite 进行实验的快速介绍，
+ * 而无需进行大量繁琐的阅读和配置。
  *
- * Introduction to the UnQLite (Via Jx9) Constant Expansion Mechanism:
+ * UnQLite（通过 Jx9）常量扩展机制简介：
  *
- * The Document store to UnQLite which is used to store JSON docs (i.e. Objects, Arrays, Strings, etc.)
- * in the database is powered by the Jx9 programming language.
+ * UnQLite 的文档存储用于在数据库中存储 JSON 文档（即对象、数组、字符串等），
+ * 由 Jx9 编程语言提供支持。
  *
- * Jx9 is an embeddable scripting language also called extension language designed
- * to support general procedural programming with data description facilities.
- * Jx9 is a Turing-Complete, dynamically typed programming language based on JSON
- * and implemented as a library in the UnQLite core.
+ * Jx9 是一种嵌入式脚本语言，也称为扩展语言，旨在支持具有数据描述功能的
+ * 通用过程编程。Jx9 是一种基于 JSON 的图灵完备、动态类型的编程语言，
+ * 在 UnQLite 核心中作为库实现。
  *
- * Jx9 is built with a tons of features and has a clean and familiar syntax similar
- * to C and Javascript.
- * Being an extension language, Jx9 has no notion of a main program, it only works
- * embedded in a host application.
- * The host program (UnQLite in our case) can write and read Jx9 variables and can
- * register C/C++ functions to be called by Jx9 code. 
+ * Jx9 拥有大量功能，具有类似于 C 和 Javascript 的简洁熟悉的语法。
+ * 作为扩展语言，Jx9 没有主程序的概念，它只能作为主机应用程序的一部分运行。
+ * 主机程序（我们的例子中是 UnQLite）可以写入和读取 Jx9 变量，
+ * 还可以注册要由 Jx9 代码调用的 C/C++ 函数。
  *
- * The constant expansion mechanism under Jx9 is extremely powerful yet simple and work
- * as follows:
- * Each registered constant have a C procedure associated with it. This procedure known
- * as the constant expansion callback is responsible of expanding the invoked constant
- * to the desired value, for example:
- * The C procedure associated with the "__PI__" constant expands to 3.14 (the value of PI).
- * the "__OS__" constant procedure expands to the name of the host Operating
- * Systems (Windows, Linux, ...), the "__TIME__" constant expands to the current system time
- * and so forth.
+ * Jx9 下的常量扩展机制非常强大但简单，工作原理如下：
+ * 每个注册的常量都有一个关联的 C 过程。这个过程称为常量扩展回调，
+ * 负责将调用的常量扩展为所需的值，例如：
+ * 与 "__PI__" 常量关联的 C 过程扩展为 3.14（PI 的值）。
+ * "__OS__" 常量过程扩展为主机操作系统的名称（Windows、Linux、...），
+ * "__TIME__" 常量扩展为当前系统时间，等等。
  * 
- * For an introductory course to the constant expansion meachanism, you can refer
- * to the following tutorial:
+ * 有关常量扩展机制的入门课程，您可以参阅以下教程：
  *        http://unqlite.org/const_intro.html
- * For an introduction to the UnQLite C/C++ interface, please refer to:
+ * 有关 UnQLite C/C++ 接口的介绍，请参阅：
  *        http://unqlite.org/api_intro.html
- * For an introduction to Jx9, please refer to:
+ * 有关 Jx9 的介绍，请参阅：
  *        http://unqlite.org/jx9.html
- * For the full C/C++ API reference guide, please refer to:
+ * 有关完整的 C/C++ API 参考指南，请参阅：
  *        http://unqlite.org/c_api.html
- * UnQLite in 5 Minutes or Less:
+ * 5 分钟或更短时间内了解 UnQLite：
  *        http://unqlite.org/intro.html
- * The Architecture of the UnQLite Database Engine:
+ * UnQLite 数据库引擎的架构：
  *        http://unqlite.org/arch.html
  */
 /* $SymiscID: unqlite_const_intro.c v1.5 Unix 2013-05-17 00:17 stable <chm@symisc.net> $ */
 /* 
- * Make sure you have the latest release of UnQLite from:
+ * 确保您有 UnQLite 的最新版本：
  *  http://unqlite.org/downloads.html
  */
 #include <stdio.h>  /* puts() */
 #include <stdlib.h> /* exit() */
-/* Make sure this header file is available.*/
+/* 确保此头文件可用。*/
 #include "unqlite.h"
 /*
  * Banner.

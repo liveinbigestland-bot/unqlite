@@ -1,102 +1,77 @@
-/* This file was automatically generated.  Do not edit (except for compile time directive)! */ 
+/* 本文件由自动生成。请勿修改（编译时指令除外）！*/
 #ifndef _JX9H_
 #define _JX9H_
 /*
- * Symisc Jx9: A Highly Efficient Embeddable Scripting Engine Based on JSON.
- * Copyright (C) 2012-2013, Symisc Systems http://jx9.symisc.net/
- * Version 1.7.2
- * For information on licensing, redistribution of this file, and for a DISCLAIMER OF ALL WARRANTIES
- * please contact Symisc Systems via:
+ * Symisc Jx9: 一个基于 JSON 的高效嵌入式脚本引擎。
+ * 版权所有 (C) 2012-2013, Symisc Systems http://jx9.symisc.net/
+ * 版本 1.7.2
+ * 有关许可协议、再分发和免责声明的详细信息，请联系 Symisc Systems：
  *       legal@symisc.net
  *       licensing@symisc.net
  *       contact@symisc.net
- * or visit:
+ * 或访问：
  *      http://jx9.symisc.net/
  */
 /*
- * Copyright (C) 2012, 2013 Symisc Systems. All rights reserved.
+ * 版权所有 (C) 2012, 2013 Symisc Systems。保留所有权利。
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. Redistributions in any form must be accompanied by information on
- *    how to obtain complete source code for the JX9 engine and any 
- *    accompanying software that uses the JX9 engine software.
- *    The source code must either be included in the distribution
- *    or be available for no more than the cost of distribution plus
- *    a nominal fee, and must be freely redistributable under reasonable
- *    conditions. For an executable file, complete source code means
- *    the source code for all modules it contains.It does not include
- *    source code for modules or files that typically accompany the major
- *    components of the operating system on which the executable file runs.
+ * 在满足以下条件的前提下，允许以源代码和二进制形式重新分发和使用：
+ * 1. 源代码的分发必须保留上述版权声明、本条件列表和以下免责声明。
+ * 2. 二进制形式的分发必须在提供的文档和/或其他材料中重现上述版权
+ *    声明、本条件列表和以下免责声明。
+ * 3. 以任何形式分发必须随附获取 JX9 引擎及相关软件完整源代码的信息。
+ *    源代码必须包含在分发中或可获取，且获取费用不超过分发成本加上
+ *    象征性费用，且必须在合理条件下可自由分发。对于可执行文件，完整
+ *    源代码指其包含的所有模块的源代码，不包括与可执行文件运行所在的
+ *    操作系统主要组件一起提供的典型模块的源代码。
  *
- * THIS SOFTWARE IS PROVIDED BY SYMISC SYSTEMS ``AS IS'' AND ANY EXPRESS
- * OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, OR
- * NON-INFRINGEMENT, ARE DISCLAIMED.  IN NO EVENT SHALL SYMISC SYSTEMS
- * BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR
- * BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, 
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
- * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
- * IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * 本软件按"原样"提供，SYMISC SYSTEMS 不做任何明示或暗示的保证，
+ * 包括但不限于对适销性、特定用途适用性和非侵权性的保证。在任何情况下，
+ * SYMISC SYSTEMS 均不对任何直接、间接、偶然、特殊、惩戒性或后果性
+ * 损害（包括但不限于替代商品或服务的采购、使用、数据丢失、利润损失
+ * 或业务中断）承担责任，无论何种原因导致，即使已被告知可能发生此类损害。
  */
  /* $SymiscID: jx9.h v2.1 UNIX|WIN32/64 2012-09-15 09:43 stable <chm@symisc.net> $ */
 #include "unqlite.h"
 /*
- * Compile time engine version, signature, identification in the symisc source tree
- * and copyright notice.
- * Each macro have an equivalent C interface associated with it that provide the same
- * information but are associated with the library instead of the header file.
- * Refer to [jx9_lib_version()], [jx9_lib_signature()], [jx9_lib_ident()] and
- * [jx9_lib_copyright()] for more information.
+ * 编译时引擎版本、签名、Symisc 源码树中的标识和版权声明。
+ * 每个宏都有对应的 C 接口函数，提供相同的信息，但与库关联而非头文件。
+ * 请参阅 [jx9_lib_version()]、[jx9_lib_signature()]、[jx9_lib_ident()] 和
+ * [jx9_lib_copyright()] 了解更多信息。
  */
 /*
- * The JX9_VERSION C preprocessor macroevaluates to a string literal
- * that is the jx9 version in the format "X.Y.Z" where X is the major
- * version number and Y is the minor version number and Z is the release
- * number.
+ * JX9_VERSION 预处理器宏计算为一个字符串字面量，
+ * 格式为 "X.Y.Z"，其中 X 为主版本号，Y 为次版本号，Z 为发布版本号。
  */
 #define JX9_VERSION "1.7.2"
 /*
- * The JX9_VERSION_NUMBER C preprocessor macro resolves to an integer
- * with the value (X*1000000 + Y*1000 + Z) where X, Y, and Z are the same
- * numbers used in [JX9_VERSION].
+ * JX9_VERSION_NUMBER 预处理器宏解析为一个整数值 (X*1000000 + Y*1000 + Z)，
+ * 其中 X、Y 和 Z 与 [JX9_VERSION] 中使用的数字相同。
  */
 #define JX9_VERSION_NUMBER 1007002
 /*
- * The JX9_SIG C preprocessor macro evaluates to a string
- * literal which is the public signature of the jx9 engine.
- * This signature could be included for example in a host-application
- * generated Server MIME header as follows:
+ * JX9_SIG 预处理器宏计算为字符串字面量，表示 jx9 引擎的公共签名。
+ * 此签名可包含在主机应用程序生成的 Server MIME 头中，如下所示：
  *   Server: YourWebServer/x.x Jx9/x.x.x \r\n
  */
 #define JX9_SIG "Jx9/1.7.2"
 /*
- * JX9 identification in the Symisc source tree:
- * Each particular check-in of a particular software released
- * by symisc systems have an unique identifier associated with it.
- * This macro hold the one associated with jx9.
+ * JX9 在 Symisc 源码树中的标识：
+ * Symisc Systems 发布的每个软件版本都有唯一的标识符。
+ * 此宏保存与 jx9 关联的标识符。
  */
 #define JX9_IDENT "jx9:d217a6e8c7f10fb35a8becb2793101fd2036aeb7"
 /*
- * Copyright notice.
- * If you have any questions about the licensing situation, please
- * visit http://jx9.symisc.net/licensing.html
- * or contact Symisc Systems via:
+ * 版权声明。
+ * 如有关于许可协议的问题，请访问 http://jx9.symisc.net/licensing.html
+ * 或联系 Symisc Systems：
  *   legal@symisc.net
  *   licensing@symisc.net
  *   contact@symisc.net
  */
-#define JX9_COPYRIGHT "Copyright (C) Symisc Systems 2012-2013, http://jx9.symisc.net/"
+#define JX9_COPYRIGHT "版权所有 (C) Symisc Systems 2012-2013, http://jx9.symisc.net/"
 
-/* Forward declaration to public objects */
+/* 公共对象的前向声明 */
 typedef struct jx9_io_stream jx9_io_stream;
 typedef struct jx9_context jx9_context;
 typedef struct jx9_value jx9_value;
@@ -112,20 +87,20 @@ typedef struct jx9 jx9;
 #ifdef UNQLITE_ENABLE_THREADS
 #define JX9_ENABLE_THREADS
 #endif /* UNQLITE_ENABLE_THREADS */
-/* Standard JX9 return values */
-#define JX9_OK      SXRET_OK      /* Successful result */
-/* beginning-of-error-codes */
-#define JX9_NOMEM   UNQLITE_NOMEM     /* Out of memory */
-#define JX9_ABORT   UNQLITE_ABORT   /* Foreign Function request operation abort/Another thread have released this instance */
-#define JX9_IO_ERR  UNQLITE_IOERR      /* IO error */
-#define JX9_CORRUPT UNQLITE_CORRUPT /* Corrupt pointer/Unknown configuration option */
-#define JX9_LOOKED  UNQLITE_LOCKED  /* Forbidden Operation */ 
-#define JX9_COMPILE_ERR UNQLITE_COMPILE_ERR /* Compilation error */
-#define JX9_VM_ERR      UNQLITE_VM_ERR      /* Virtual machine error */
-/* end-of-error-codes */
+/* 标准 JX9 返回值 */
+#define JX9_OK      SXRET_OK      /* 成功结果 */
+/* 错误码开始 */
+#define JX9_NOMEM   UNQLITE_NOMEM     /* 内存不足 */
+#define JX9_ABORT   UNQLITE_ABORT   /* 外部函数请求中止操作/另一线程已释放此实例 */
+#define JX9_IO_ERR  UNQLITE_IOERR      /* IO 错误 */
+#define JX9_CORRUPT UNQLITE_CORRUPT /* 损坏的指针/未知配置选项 */
+#define JX9_LOOKED  UNQLITE_LOCKED  /* 禁止操作 */ 
+#define JX9_COMPILE_ERR UNQLITE_COMPILE_ERR /* 编译错误 */
+#define JX9_VM_ERR      UNQLITE_VM_ERR      /* 虚拟机错误 */
+/* 错误码结束 */
 /*
- * If compiling for a processor that lacks floating point
- * support, substitute integer for floating-point.
+ * 如果为缺乏浮点支持的处理器编译，
+ * 则用整数替代浮点数。
  */
 #ifdef JX9_OMIT_FLOATING_POINT
 typedef sxi64 jx9_real;
@@ -134,36 +109,28 @@ typedef double jx9_real;
 #endif
 typedef sxi64 jx9_int64;
 /*
- * Engine Configuration Commands.
+ * 引擎配置命令。
  *
- * The following set of constants are the available configuration verbs that can
- * be used by the host-application to configure the JX9 engine.
- * These constants must be passed as the second argument to the [jx9_config()] 
- * interface.
- * Each options require a variable number of arguments.
- * The [jx9_config()] interface will return JX9_OK on success, any other
- * return value indicates failure.
- * For a full discussion on the configuration verbs and their expected 
- * parameters, please refer to this page:
+ * 以下常量集是可用于主机应用程序配置 JX9 引擎的配置动词。
+ * 这些常量必须作为第二个参数传递给 [jx9_config()] 接口。
+ * 每个选项需要可变数量的参数。
+ * [jx9_config()] 接口成功时返回 JX9_OK，任何其他返回值表示失败。
+ * 有关配置动词及其预期参数的完整讨论，请参阅此页面：
  *      http://jx9.symisc.net/c_api_func.html#jx9_config
  */
 #define JX9_CONFIG_ERR_ABORT     1  /* RESERVED FOR FUTURE USE */
 #define JX9_CONFIG_ERR_LOG       2  /* TWO ARGUMENTS: const char **pzBuf, int *pLen */
 /*
- * Virtual Machine Configuration Commands.
+ * 虚拟机配置命令。
  *
- * The following set of constants are the available configuration verbs that can
- * be used by the host-application to configure the JX9 Virtual machine.
- * These constants must be passed as the second argument to the [jx9_vm_config()] 
- * interface.
- * Each options require a variable number of arguments.
- * The [jx9_vm_config()] interface will return JX9_OK on success, any other return
- * value indicates failure.
- * There are many options but the most importants are: JX9_VM_CONFIG_OUTPUT which install
- * a VM output consumer callback, JX9_VM_CONFIG_HTTP_REQUEST which parse and register
- * a HTTP request and JX9_VM_CONFIG_ARGV_ENTRY which populate the $argv array.
- * For a full discussion on the configuration verbs and their expected parameters, please
- * refer to this page:
+ * 以下常量集是可用于主机应用程序配置 JX9 虚拟机的配置动词。
+ * 这些常量必须作为第二个参数传递给 [jx9_vm_config()] 接口。
+ * 每个选项需要可变数量的参数。
+ * [jx9_vm_config()] 接口成功时返回 JX9_OK，任何其他返回值表示失败。
+ * 有很多选项，但最重要的是：JX9_VM_CONFIG_OUTPUT 用于安装 VM 输出消费者回调，
+ * JX9_VM_CONFIG_HTTP_REQUEST 用于解析和注册 HTTP 请求，
+ * JX9_VM_CONFIG_ARGV_ENTRY 用于填充 $argv 数组。
+ * 有关配置动词及其预期参数的完整讨论，请参阅此页面：
  *      http://jx9.symisc.net/c_api_func.html#jx9_vm_config
  */
 #define JX9_VM_CONFIG_OUTPUT           UNQLITE_VM_CONFIG_OUTPUT  /* TWO ARGUMENTS: int (*xConsumer)(const void *pOut, unsigned int nLen, void *pUserData), void *pUserData */
@@ -180,27 +147,21 @@ typedef sxi64 jx9_int64;
 #define JX9_VM_CONFIG_ARGV_ENTRY       UNQLITE_VM_CONFIG_ARGV_ENTRY  /* ONE ARGUMENT: const char *zValue */
 #define JX9_VM_CONFIG_EXTRACT_OUTPUT   UNQLITE_VM_CONFIG_EXTRACT_OUTPUT  /* TWO ARGUMENTS: const void **ppOut, unsigned int *pOutputLen */
 /*
- * Global Library Configuration Commands.
+ * 全局库配置命令。
  *
- * The following set of constants are the available configuration verbs that can
- * be used by the host-application to configure the whole library.
- * These constants must be passed as the first argument to the [jx9_lib_config()] 
- * interface.
- * Each options require a variable number of arguments.
- * The [jx9_lib_config()] interface will return JX9_OK on success, any other return
- * value indicates failure.
- * Notes:
- * The default configuration is recommended for most applications and so the call to
- * [jx9_lib_config()] is usually not necessary. It is provided to support rare 
- * applications with unusual needs. 
- * The [jx9_lib_config()] interface is not threadsafe. The application must insure that
- * no other [jx9_*()] interfaces are invoked by other threads while [jx9_lib_config()]
- * is running. Furthermore, [jx9_lib_config()] may only be invoked prior to library
- * initialization using [jx9_lib_init()] or [jx9_init()] or after shutdown
- * by [jx9_lib_shutdown()]. If [jx9_lib_config()] is called after [jx9_lib_init()]
- * or [jx9_init()] and before [jx9_lib_shutdown()] then it will return jx9LOCKED.
- * For a full discussion on the configuration verbs and their expected parameters, please
- * refer to this page:
+ * 以下常量集是可用于主机应用程序配置整个库的配置动词。
+ * 这些常量必须作为第一个参数传递给 [jx9_lib_config()] 接口。
+ * 每个选项需要可变数量的参数。
+ * [jx9_lib_config()] 接口成功时返回 JX9_OK，任何其他返回值表示失败。
+ * 注意：
+ * 默认配置推荐用于大多数应用程序，因此通常不需要调用 [jx9_lib_config()]。
+ * 提供此接口是为了支持有特殊需求的少数应用程序。
+ * [jx9_lib_config()] 接口不是线程安全的。应用程序必须确保在 [jx9_lib_config()]
+ * 运行期间，其他线程不会调用任何 [jx9_*()] 接口。此外，[jx9_lib_config()] 只能
+ * 在使用 [jx9_lib_init()] 或 [jx9_init()] 进行库初始化之前或使用 [jx9_lib_shutdown()]
+ * 关闭之后调用。如果在 [jx9_lib_init()] 或 [jx9_init()] 之后且在 [jx9_lib_shutdown()] 
+ * 之前调用 [jx9_lib_config()]，则将返回 jx9LOCKED。
+ * 有关配置动词及其预期参数的完整讨论，请参阅此页面：
  *      http://jx9.symisc.net/c_api_func.html#Global_Library_Management_Interfaces
  */
 #define JX9_LIB_CONFIG_USER_MALLOC            1 /* ONE ARGUMENT: const SyMemMethods *pMemMethods */ 
@@ -210,35 +171,30 @@ typedef sxi64 jx9_int64;
 #define JX9_LIB_CONFIG_THREAD_LEVEL_MULTI     5 /* NO ARGUMENTS */ 
 #define JX9_LIB_CONFIG_VFS                    6 /* ONE ARGUMENT: const jx9_vfs *pVfs */
 /*
- * Call Context - Error Message Serverity Level.
+ * 调用上下文 - 错误消息严重级别。
  */
-#define JX9_CTX_ERR      UNQLITE_CTX_ERR      /* Call context error such as unexpected number of arguments, invalid types and so on. */
-#define JX9_CTX_WARNING  UNQLITE_CTX_WARNING  /* Call context Warning */
-#define JX9_CTX_NOTICE   UNQLITE_CTX_NOTICE   /* Call context Notice */
-/* Current VFS structure version*/
+#define JX9_CTX_ERR      UNQLITE_CTX_ERR      /* 调用上下文错误，如参数数量无效、类型无效等。*/
+#define JX9_CTX_WARNING  UNQLITE_CTX_WARNING  /* 调用上下文警告 */
+#define JX9_CTX_NOTICE   UNQLITE_CTX_NOTICE   /* 调用上下文通知 */
+/* 当前 VFS 结构版本*/
 #define JX9_VFS_VERSION 2 
 /* 
- * JX9 Virtual File System (VFS).
+ * JX9 虚拟文件系统 (VFS)。
  *
- * An instance of the jx9_vfs object defines the interface between the JX9 core
- * and the underlying operating system. The "vfs" in the name of the object stands
- * for "virtual file system". The vfs is used to implement JX9 system functions
- * such as mkdir(), chdir(), stat(), get_user_name() and many more.
- * The value of the iVersion field is initially 2 but may be larger in future versions
- * of JX9.
- * Additional fields may be appended to this object when the iVersion value is increased.
- * Only a single vfs can be registered within the JX9 core. Vfs registration is done
- * using the jx9_lib_config() interface with a configuration verb set to JX9_LIB_CONFIG_VFS.
- * Note that Windows and UNIX (Linux, FreeBSD, Solaris, Mac OS X, etc.) users does not have to
- * worry about registering and installing a vfs since JX9 come with a built-in vfs for these
- * platforms which implement most the methods defined below.
- * Host-application running on exotic systems (ie: Other than Windows and UNIX systems) must
- * register their own vfs in order to be able to use and call JX9 system functions.
- * Also note that the jx9_compile_file() interface depend on the xMmap() method of the underlying
- * vfs which mean that this method must be available (Always the case using the built-in VFS)
- * in order to use this interface.
- * Developers wishing to implement their own vfs an contact symisc systems to obtain
- * the JX9 VFS C/C++ Specification manual.
+ * jx9_vfs 对象的实例定义了 JX9 核心与底层操作系统之间的接口。
+ * 对象名中的 "vfs" 代表"虚拟文件系统"。vfs 用于实现 JX9 系统函数，
+ * 如 mkdir()、chdir()、stat()、get_user_name() 等。
+ * iVersion 字段的值初始为 2，但在未来版本的 JX9 中可能更大。
+ * 当 iVersion 值增加时，可能会向此对象追加额外字段。
+ * 只能在 JX9 核心中注册单个 vfs。vfs 注册使用 jx9_lib_config() 接口，
+ * 配置动词设置为 JX9_LIB_CONFIG_VFS。
+ * 注意，Windows 和 UNIX（Linux、FreeBSD、Solaris、Mac OS X 等）用户不必担心
+ * vfs 的注册和安装，因为 JX9 为这些平台提供了内置 vfs，实现了以下定义的大多数方法。
+ * 在非主流系统（即 Windows 和 UNIX 系统以外的系统）上运行的主机应用程序必须
+ * 注册自己的 vfs 才能使用和调用 JX9 系统函数。
+ * 还要注意，jx9_compile_file() 接口依赖于底层 vfs 的 xMmap() 方法，
+ * 因此此方法必须可用（使用内置 VFS 时始终如此）才能使用此接口。
+ * 希望实现自己的 vfs 的开发者请联系 symisc systems 获取 JX9 VFS C/C++ 规范手册。
  */
 struct jx9_vfs
 {
@@ -288,13 +244,11 @@ struct jx9_vfs
 	void (*xUsername)(jx9_context *);                /* Running username */
 	int (*xExec)(const char *, jx9_context *);        /* Execute an external program */
 };
-/* Current JX9 IO stream structure version. */
+/* 当前 JX9 IO 流结构版本。*/
 #define JX9_IO_STREAM_VERSION 1 
 /* 
- * Possible open mode flags that can be passed to the xOpen() routine
- * of the underlying IO stream device .
- * Refer to the JX9 IO Stream C/C++ specification manual (http://jx9.symisc.net/io_stream_spec.html)
- * for additional information.
+ * 可以传递给底层 IO 流设备的 xOpen() 例程的可能打开模式标志。
+ * 有关其他信息，请参阅 JX9 IO 流 C/C++ 规范手册 (http://jx9.symisc.net/io_stream_spec.html)。
  */
 #define JX9_IO_OPEN_RDONLY   0x001  /* Read-only open */
 #define JX9_IO_OPEN_WRONLY   0x002  /* Write-only open */
@@ -307,33 +261,27 @@ struct jx9_vfs
 #define JX9_IO_OPEN_TEMP     0x100  /* Simple hint: Temporary file */
 #define JX9_IO_OPEN_TEXT     0x200  /* Simple hint: Data is textual */
 /*
- * JX9 IO Stream Device.
+ * JX9 IO 流设备。
  *
- * An instance of the jx9_io_stream object defines the interface between the JX9 core
- * and the underlying stream device.
- * A stream is a smart mechanism for generalizing file, network, data compression
- * and other IO operations which share a common set of functions using an abstracted
- * unified interface.
- * A stream device is additional code which tells the stream how to handle specific
- * protocols/encodings. For example, the http device knows how to translate a URL
- * into an HTTP/1.1 request for a file on a remote server.
- * JX9 come with two built-in IO streams device:
- * The file:// stream which perform very efficient disk IO and the jx9:// stream
- * which is a special stream that allow access various I/O streams (See the JX9 official
- * documentation for more information on this stream).
- * A stream is referenced as: scheme://target 
- * scheme(string) - The name of the wrapper to be used. Examples include: file, http, https, ftp, 
- * ftps, compress.zlib, compress.bz2, and jx9. If no wrapper is specified, the function default
- * is used (typically file://). 
- * target - Depends on the device used. For filesystem related streams this is typically a path
- * and filename of the desired file.For network related streams this is typically a hostname, often
- * with a path appended. 
- * IO stream devices are registered using a call to jx9_vm_config() with a configuration verb
- * set to JX9_VM_CONFIG_IO_STREAM.
- * Currently the JX9 development team is working on the implementation of the http:// and ftp://
- * IO stream protocols. These devices will be available in the next major release of the JX9 engine.
- * Developers wishing to implement their own IO stream devices must understand and follow
- * The JX9 IO Stream C/C++ specification manual (http://jx9.symisc.net/io_stream_spec.html).
+ * jx9_io_stream 对象的实例定义了 JX9 核心与底层流设备之间的接口。
+ * 流是一种智能机制，用于概括文件、网络、数据压缩和其他 IO 操作，
+ * 这些操作使用抽象的统一接口共享一组通用函数。
+ * 流设备是告诉流如何处理特定协议/编码的附加代码。例如，
+ * http 设备知道如何将 URL 转换为远程服务器上文件的 HTTP/1.1 请求。
+ * JX9 附带两个内置 IO 流设备：
+ * 执行高效磁盘 IO 的 file:// 流和允许访问各种 I/O 流的特殊 jx9:// 流
+ * （有关此流的更多信息，请参阅 JX9 官方文档）。
+ * 流的引用格式为：scheme://target
+ * scheme(字符串) - 要使用的包装器名称。示例包括：file、http、https、ftp、
+ * ftps、compress.zlib、compress.bz2 和 jx9。如果未指定包装器，
+ * 则使用函数默认值（通常为 file://）。
+ * target - 取决于使用的设备。对于文件系统相关的流，这通常是所需文件的路径和文件名。
+ * 对于网络相关的流，这通常是主机名，通常还附有路径。
+ * IO 流设备使用调用 jx9_vm_config() 并将配置动词设置为 JX9_VM_CONFIG_IO_STREAM 来注册。
+ * 目前 JX9 开发团队正在努力实现 http:// 和 ftp:// IO 流协议。这些设备将在
+ * JX9 引擎的下一个主要版本中提供。
+ * 希望实现自己的 IO 流设备的开发者必须理解并遵循
+ * JX9 IO 流 C/C++ 规范手册 (http://jx9.symisc.net/io_stream_spec.html)。
  */
 struct jx9_io_stream
 {
@@ -355,29 +303,28 @@ struct jx9_io_stream
 	int (*xStat)(void *, jx9_value *, jx9_value *);          /* Stat an open stream handle */
 };
 /* 
- * C-API-REF: Please refer to the official documentation for interfaces
- * purpose and expected parameters. 
- */ 
-/* Engine Handling Interfaces */
+ * C-API-REF：请参阅官方文档以了解接口用途和预期参数。
+ */
+/* 引擎处理接口 */
 JX9_PRIVATE int jx9_init(jx9 **ppEngine);
 /*JX9_PRIVATE int jx9_config(jx9 *pEngine, int nConfigOp, ...);*/
 JX9_PRIVATE int jx9_release(jx9 *pEngine);
-/* Compile Interfaces */
+/* 编译接口 */
 JX9_PRIVATE int jx9_compile(jx9 *pEngine, const char *zSource, int nLen, jx9_vm **ppOutVm);
 JX9_PRIVATE int jx9_compile_file(jx9 *pEngine, const char *zFilePath, jx9_vm **ppOutVm);
-/* Virtual Machine Handling Interfaces */
+/* 虚拟机处理接口 */
 JX9_PRIVATE int jx9_vm_config(jx9_vm *pVm, int iConfigOp, ...);
 /*JX9_PRIVATE int jx9_vm_exec(jx9_vm *pVm, int *pExitStatus);*/
 /*JX9_PRIVATE jx9_value * jx9_vm_extract_variable(jx9_vm *pVm,const char *zVarname);*/
 /*JX9_PRIVATE int jx9_vm_reset(jx9_vm *pVm);*/
 JX9_PRIVATE int jx9_vm_release(jx9_vm *pVm);
 /*JX9_PRIVATE int jx9_vm_dump_v2(jx9_vm *pVm, int (*xConsumer)(const void *, unsigned int, void *), void *pUserData);*/
-/* In-process Extending Interfaces */
+/* 进程内扩展接口 */
 JX9_PRIVATE int jx9_create_function(jx9_vm *pVm, const char *zName, int (*xFunc)(jx9_context *, int, jx9_value **), void *pUserData);
 /*JX9_PRIVATE int jx9_delete_function(jx9_vm *pVm, const char *zName);*/
 JX9_PRIVATE int jx9_create_constant(jx9_vm *pVm, const char *zName, void (*xExpand)(jx9_value *, void *), void *pUserData);
 /*JX9_PRIVATE int jx9_delete_constant(jx9_vm *pVm, const char *zName);*/
-/* Foreign Function Parameter Values */
+/* 外部函数参数值 */
 JX9_PRIVATE int jx9_value_to_int(jx9_value *pValue);
 JX9_PRIVATE int jx9_value_to_bool(jx9_value *pValue);
 JX9_PRIVATE jx9_int64 jx9_value_to_int64(jx9_value *pValue);
@@ -385,7 +332,7 @@ JX9_PRIVATE double jx9_value_to_double(jx9_value *pValue);
 JX9_PRIVATE const char * jx9_value_to_string(jx9_value *pValue, int *pLen);
 JX9_PRIVATE void * jx9_value_to_resource(jx9_value *pValue);
 JX9_PRIVATE int jx9_value_compare(jx9_value *pLeft, jx9_value *pRight, int bStrict);
-/* Setting The Result Of A Foreign Function */
+/* 设置外部函数的结果 */
 JX9_PRIVATE int jx9_result_int(jx9_context *pCtx, int iValue);
 JX9_PRIVATE int jx9_result_int64(jx9_context *pCtx, jx9_int64 iValue);
 JX9_PRIVATE int jx9_result_bool(jx9_context *pCtx, int iBool);
@@ -395,7 +342,7 @@ JX9_PRIVATE int jx9_result_string(jx9_context *pCtx, const char *zString, int nL
 JX9_PRIVATE int jx9_result_string_format(jx9_context *pCtx, const char *zFormat, ...);
 JX9_PRIVATE int jx9_result_value(jx9_context *pCtx, jx9_value *pValue);
 JX9_PRIVATE int jx9_result_resource(jx9_context *pCtx, void *pUserData);
-/* Call Context Handling Interfaces */
+/* 调用上下文处理接口 */
 JX9_PRIVATE int jx9_context_output(jx9_context *pCtx, const char *zString, int nLen);
 /*JX9_PRIVATE int jx9_context_output_format(jx9_context *pCtx, const char *zFormat, ...);*/
 JX9_PRIVATE int jx9_context_throw_error(jx9_context *pCtx, int iErr, const char *zErr);
@@ -408,18 +355,18 @@ JX9_PRIVATE void * jx9_context_peek_aux_data(jx9_context *pCtx);
 JX9_PRIVATE void * jx9_context_pop_aux_data(jx9_context *pCtx);
 JX9_PRIVATE unsigned int jx9_context_result_buf_length(jx9_context *pCtx);
 JX9_PRIVATE const char * jx9_function_name(jx9_context *pCtx);
-/* Call Context Memory Management Interfaces */
+/* 调用上下文内存管理接口 */
 JX9_PRIVATE void * jx9_context_alloc_chunk(jx9_context *pCtx, unsigned int nByte, int ZeroChunk, int AutoRelease);
 JX9_PRIVATE void * jx9_context_realloc_chunk(jx9_context *pCtx, void *pChunk, unsigned int nByte);
 JX9_PRIVATE void jx9_context_free_chunk(jx9_context *pCtx, void *pChunk);
-/* On Demand Dynamically Typed Value Object allocation interfaces */
+/* 按需动态类型值对象分配接口 */
 JX9_PRIVATE jx9_value * jx9_new_scalar(jx9_vm *pVm);
 JX9_PRIVATE jx9_value * jx9_new_array(jx9_vm *pVm);
 JX9_PRIVATE int jx9_release_value(jx9_vm *pVm, jx9_value *pValue);
 JX9_PRIVATE jx9_value * jx9_context_new_scalar(jx9_context *pCtx);
 JX9_PRIVATE jx9_value * jx9_context_new_array(jx9_context *pCtx);
 JX9_PRIVATE void jx9_context_release_value(jx9_context *pCtx, jx9_value *pValue);
-/* Dynamically Typed Value Object Management Interfaces */
+/* 动态类型值对象管理接口 */
 JX9_PRIVATE int jx9_value_int(jx9_value *pVal, int iValue);
 JX9_PRIVATE int jx9_value_int64(jx9_value *pVal, jx9_int64 iValue);
 JX9_PRIVATE int jx9_value_bool(jx9_value *pVal, int iBool);
@@ -430,13 +377,13 @@ JX9_PRIVATE int jx9_value_string_format(jx9_value *pVal, const char *zFormat, ..
 JX9_PRIVATE int jx9_value_reset_string_cursor(jx9_value *pVal);
 JX9_PRIVATE int jx9_value_resource(jx9_value *pVal, void *pUserData);
 JX9_PRIVATE int jx9_value_release(jx9_value *pVal);
-/* JSON Array/Object Management Interfaces */
+/* JSON 数组/对象管理接口 */
 JX9_PRIVATE jx9_value * jx9_array_fetch(jx9_value *pArray, const char *zKey, int nByte);
 JX9_PRIVATE int jx9_array_walk(jx9_value *pArray, int (*xWalk)(jx9_value *, jx9_value *, void *), void *pUserData);
 JX9_PRIVATE int jx9_array_add_elem(jx9_value *pArray, jx9_value *pKey, jx9_value *pValue);
 JX9_PRIVATE int jx9_array_add_strkey_elem(jx9_value *pArray, const char *zKey, jx9_value *pValue);
 JX9_PRIVATE unsigned int jx9_array_count(jx9_value *pArray);
-/* Dynamically Typed Value Object Query Interfaces */
+/* 动态类型值对象查询接口 */
 JX9_PRIVATE int jx9_value_is_int(jx9_value *pVal);
 JX9_PRIVATE int jx9_value_is_float(jx9_value *pVal);
 JX9_PRIVATE int jx9_value_is_bool(jx9_value *pVal);
@@ -449,7 +396,7 @@ JX9_PRIVATE int jx9_value_is_json_array(jx9_value *pVal);
 JX9_PRIVATE int jx9_value_is_json_object(jx9_value *pVal);
 JX9_PRIVATE int jx9_value_is_resource(jx9_value *pVal);
 JX9_PRIVATE int jx9_value_is_empty(jx9_value *pVal);
-/* Global Library Management Interfaces */
+/* 全局库管理接口 */
 /*JX9_PRIVATE int jx9_lib_init(void);*/
 JX9_PRIVATE int jx9_lib_config(int nConfigOp, ...);
 JX9_PRIVATE int jx9_lib_shutdown(void);

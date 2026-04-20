@@ -1,56 +1,52 @@
 /*
- * Symisc JX9: A Highly Efficient Embeddable Scripting Engine Based on JSON.
- * Copyright (C) 2012-2013, Symisc Systems http://jx9.symisc.net/
- * Version 1.7.2
- * For information on licensing, redistribution of this file, and for a DISCLAIMER OF ALL WARRANTIES
- * please contact Symisc Systems via:
+ * Symisc JX9: 一个基于 JSON 的高效嵌入式脚本引擎。
+ * 版权所有 (C) 2012-2013, Symisc Systems http://jx9.symisc.net/
+ * 版本 1.7.2
+ * 有关许可协议、再分发和免责声明的详细信息，请联系 Symisc Systems：
  *       legal@symisc.net
  *       licensing@symisc.net
  *       contact@symisc.net
- * or visit:
+ * 或访问：
  *      http://jx9.symisc.net/
  */
  /* $SymiscID: api.c v1.7 FreeBSD 2012-12-18 06:54 stable <chm@symisc.net> $ */
 #ifndef JX9_AMALGAMATION
 #include "jx9Int.h"
 #endif
-/* This file implement the public interfaces presented to host-applications.
- * Routines in other files are for internal use by JX9 and should not be
- * accessed by users of the library.
+/* 此文件实现了向主机应用程序提供的公共接口。
+ * 其他文件中的例程供 JX9 内部使用，不应被
+ * 库的用户访问。
  */
 #define JX9_ENGINE_MAGIC 0xF874BCD7
 #define JX9_ENGINE_MISUSE(ENGINE) (ENGINE == 0 || ENGINE->nMagic != JX9_ENGINE_MAGIC)
 #define JX9_VM_MISUSE(VM) (VM == 0 || VM->nMagic == JX9_VM_STALE)
-/* If another thread have released a working instance, the following macros
- * evaluates to true. These macros are only used when the library
- * is built with threading support enabled which is not the case in
- * the default built.
+/* 如果另一个线程已释放工作实例，以下宏计算为 true。
+ * 这些宏仅在库启用线程支持构建时使用，默认构建不是这种情况。
  */
 #define JX9_THRD_ENGINE_RELEASE(ENGINE) (ENGINE->nMagic != JX9_ENGINE_MAGIC)
 #define JX9_THRD_VM_RELEASE(VM) (VM->nMagic == JX9_VM_STALE)
 /* IMPLEMENTATION: jx9@embedded@symisc 311-12-32 */
 /*
- * All global variables are collected in the structure named "sJx9MPGlobal".
- * That way it is clear in the code when we are using static variable because
- * its name start with sJx9MPGlobal.
+ * 所有全局变量都收集在名为 "sJx9MPGlobal" 的结构中。
+ * 这样，当我们在代码中使用静态变量时就很清楚，因为它的名称以 sJx9MPGlobal 开头。
  */
 static struct Jx9Global_Data
 {
-	SyMemBackend sAllocator;                /* Global low level memory allocator */
+	SyMemBackend sAllocator;                /* 全局低层内存分配器 */
 #if defined(JX9_ENABLE_THREADS)
-	const SyMutexMethods *pMutexMethods;   /* Mutex methods */
-	SyMutex *pMutex;                       /* Global mutex */
-	sxu32 nThreadingLevel;                 /* Threading level: 0 == Single threaded/1 == Multi-Threaded 
-										    * The threading level can be set using the [jx9_lib_config()]
-											* interface with a configuration verb set to
-											* JX9_LIB_CONFIG_THREAD_LEVEL_SINGLE or 
-											* JX9_LIB_CONFIG_THREAD_LEVEL_MULTI
+	const SyMutexMethods *pMutexMethods;   /* 互斥方法 */
+	SyMutex *pMutex;                       /* 全局互斥 */
+	sxu32 nThreadingLevel;                 /* 线程级别：0 == 单线程/1 == 多线程 
+										    * 线程级别可以使用 [jx9_lib_config()]
+											* 接口并通过将配置动词设置为
+											* JX9_LIB_CONFIG_THREAD_LEVEL_SINGLE 或 
+											* JX9_LIB_CONFIG_THREAD_LEVEL_MULTI 来设置
 											*/
 #endif
-	const jx9_vfs *pVfs;                    /* Underlying virtual file system */
-	sxi32 nEngine;                          /* Total number of active engines */
-	jx9 *pEngines;                          /* List of active engine */
-	sxu32 nMagic;                           /* Sanity check against library misuse */
+	const jx9_vfs *pVfs;                    /* 底层虚拟文件系统 */
+	sxi32 nEngine;                          /* 活动引擎的总数 */
+	jx9 *pEngines;                          /* 活动引擎列表 */
+	sxu32 nMagic;                           /* 对库误用的完整性检查 */
 }sJx9MPGlobal = {
 	{0, 0, 0, 0, 0, 0, 0, 0, {0}}, 
 #if defined(JX9_ENABLE_THREADS)
@@ -66,16 +62,14 @@ static struct Jx9Global_Data
 #define JX9_LIB_MAGIC  0xEA1495BA
 #define JX9_LIB_MISUSE (sJx9MPGlobal.nMagic != JX9_LIB_MAGIC)
 /*
- * Supported threading level.
- * These options have meaning only when the library is compiled with multi-threading
- * support.That is, the JX9_ENABLE_THREADS compile time directive must be defined
- * when JX9 is built.
+ * 支持的线程级别。
+ * 这些选项仅在库使用多线程支持编译时才有意义。
+ * 即，在构建 JX9 时必须定义 JX9_ENABLE_THREADS 编译时指令。
  * JX9_THREAD_LEVEL_SINGLE:
- * In this mode, mutexing is disabled and the library can only be used by a single thread.
+ * 在此模式下，互斥被禁用，库只能由单个线程使用。
  * JX9_THREAD_LEVEL_MULTI
- * In this mode, all mutexes including the recursive mutexes on [jx9] objects
- * are enabled so that the application is free to share the same engine
- * between different threads at the same time.
+ * 在此模式下，包括 [jx9] 对象上的递归互斥在内的所有互斥都被启用，
+ * 因此应用程序可以自由地在不同线程之间同时共享相同的引擎。
  */
 #define JX9_THREAD_LEVEL_SINGLE 1 
 #define JX9_THREAD_LEVEL_MULTI  2

@@ -1,48 +1,45 @@
 /*
- * Compile this file together with the UnQLite database engine source code
- * to generate the executable. For example: 
+ * 将此文件与 UnQLite 数据库引擎源代码一起编译以生成可执行文件。例如：
  *  gcc -W -Wall -O6 unqlite_kv_intro.c unqlite.c -o unqlite_kv
 */
 /*
- * This simple program is a quick introduction on how to embed and start
- * experimenting with UnQLite without having to do a lot of tedious
- * reading and configuration.
+ * 这个简单的程序是对如何嵌入和开始使用 UnQLite 进行实验的快速介绍，
+ * 而无需进行大量繁琐的阅读和配置。
  *
- * Introduction to the Key/Value Store Interfaces:
+ * 键/值存储接口简介：
  *
- * UnQLite is a standard key/value store similar to BerkeleyDB, Tokyo Cabinet, LevelDB, etc.
- * But, with a rich feature set including support for transactions (ACID), concurrent reader, etc.
- * Under the KV store, both keys and values are treated as simple arrays of bytes, so content
- * can be anything from ASCII strings, binary blob and even disk files.
- * The KV store layer is presented to host applications via a set of interfaces, these includes:
- * unqlite_kv_store(), unqlite_kv_append(), unqlite_kv_fetch_callback(), unqlite_kv_append_fmt(),
- * unqlite_kv_delete(), unqlite_kv_fetch(), etc.
+ * UnQLite 是一个标准的键/值存储，类似于 BerkeleyDB、Tokyo Cabinet、LevelDB 等。
+ * 但是，具有丰富的功能集，包括对事务（ACID）、并发读取器等的支持。
+ * 在 KV 存储下，键和值都被视为简单的字节数组，因此内容可以是
+ * ASCII 字符串、二进制 blob 甚至磁盘文件。
+ * KV 存储层通过一组接口向主机应用程序提供，包括：
+ * unqlite_kv_store()、unqlite_kv_append()、unqlite_kv_fetch_callback()、unqlite_kv_append_fmt()、
+ * unqlite_kv_delete()、unqlite_kv_fetch() 等。
  *
- * For an introduction to the UnQLite C/C++ interface, please refer to:
+ * 有关 UnQLite C/C++ 接口的介绍，请参阅：
  *        http://unqlite.org/api_intro.html
- * For the full C/C++ API reference guide, please refer to:
+ * 有关完整的 C/C++ API 参考指南，请参阅：
  *        http://unqlite.org/c_api.html
- * UnQLite in 5 Minutes or Less:
+ * 5 分钟或更短时间内了解 UnQLite：
  *        http://unqlite.org/intro.html
- * The Architecture of the UnQLite Database Engine:
+ * UnQLite 数据库引擎的架构：
  *        http://unqlite.org/arch.html
- * For an introduction to the UnQLite cursor interface, please refer to:
+ * 有关 UnQLite 游标接口的介绍，请参阅：
  *        http://unqlite.org/c_api/unqlite_kv_cursor.html
- * For an introduction to Jx9 which is the scripting language which power
- * the Document-Store interface to UnQLite, please refer to:
+ * 有关 Jx9（为 UnQLite 的文档存储接口提供动力的脚本语言）的介绍，请参阅：
  *        http://unqlite.org/jx9.html
  */
 /* $SymiscID: unqlite_kv_intro.c v1.0 FreeBSD 2013-05-14 10:17 stable <chm@symisc.net> $ */
 /* 
- * Make sure you have the latest release of UnQLite from:
+ * 确保您有 UnQLite 的最新版本：
  *  http://unqlite.org/downloads.html
  */
 #include <stdio.h>  /* puts() */
 #include <stdlib.h> /* exit() */
-/* Make sure this header file is available.*/
+/* 确保此头文件可用。*/
 #include "unqlite.h"
 /*
- * Banner.
+ * 横标。
  */
 static const char zBanner[] = {
 	"============================================================\n"
@@ -51,7 +48,7 @@ static const char zBanner[] = {
 	"============================================================\n"
 };
 /*
- * Extract the database error log and exit.
+ * 提取数据库错误日志并退出。
  */
 static void Fatal(unqlite *pDb,const char *zMsg)
 {

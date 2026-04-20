@@ -1,33 +1,31 @@
 /*
- * Symisc JX9: A Highly Efficient Embeddable Scripting Engine Based on JSON.
- * Copyright (C) 2012-2013, Symisc Systems http://jx9.symisc.net/
- * Version 1.7.2
- * For information on licensing, redistribution of this file, and for a DISCLAIMER OF ALL WARRANTIES
- * please contact Symisc Systems via:
+ * Symisc JX9: 一个基于 JSON 的高效嵌入式脚本引擎。
+ * 版权所有 (C) 2012-2013, Symisc Systems http://jx9.symisc.net/
+ * 版本 1.7.2
+ * 有关许可协议、再分发和免责声明的详细信息，请联系 Symisc Systems：
  *       legal@symisc.net
  *       licensing@symisc.net
  *       contact@symisc.net
- * or visit:
+ * 或访问：
  *      http://jx9.symisc.net/
  */
- /* $SymiscID: parse.c v1.2 FreeBSD 2012-12-11 00:46 stable <chm@symisc.net> $ */
+/* $SymiscID: parse.c v1.2 FreeBSD 2012-12-11 00:46 stable <chm@symisc.net> $ */
 #ifndef JX9_AMALGAMATION
 #include "jx9Int.h"
 #endif
-/* Expression parser for the Jx9 programming language */
-/* Operators associativity */
-#define EXPR_OP_ASSOC_LEFT   0x01 /* Left associative operator */
-#define EXPR_OP_ASSOC_RIGHT  0x02 /* Right associative operator */
-#define EXPR_OP_NON_ASSOC    0x04 /* Non-associative operator */
-/* 
- * Operators table
- * This table is sorted by operators priority (highest to lowest) according
- * the JX9 language reference manual.
- * JX9 implements all the 60 JX9 operators and have introduced the eq and ne operators.
- * The operators precedence table have been improved dramatically so that you can do same
- * amazing things now such as array dereferencing, on the fly function call, anonymous function
- * as array values, object member access on instantiation and so on.
- * Refer to the following page for a full discussion on these improvements:
+/* Jx9 编程语言的表达式解析器 */
+/* 运算符结合性 */
+#define EXPR_OP_ASSOC_LEFT   0x01 /* 左结合运算符 */
+#define EXPR_OP_ASSOC_RIGHT  0x02 /* 右结合运算符 */
+#define EXPR_OP_NON_ASSOC    0x04 /* 非结合运算符 */
+/*
+ * 运算符表
+ * 此表根据 JX9 语言参考手册按运算符优先级（从高到低）排序。
+ * JX9 实现了所有 60 个 JX9 运算符，并引入了 eq 和 ne 运算符。
+ * 运算符优先级表已得到显著改进，现在可以实现一些惊人的功能，
+ * 如数组解引用、即时函数调用、作为数组值的匿名函数、
+ * 实例化时的对象成员访问等。
+ * 有关这些改进的完整讨论，请参阅以下页面：
  * http://jx9.symisc.net/features.html
  */
 static const jx9_expr_op aOpTable[] = {

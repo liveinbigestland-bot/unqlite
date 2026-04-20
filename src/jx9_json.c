@@ -1,30 +1,29 @@
 /*
- * Symisc JX9: A Highly Efficient Embeddable Scripting Engine Based on JSON.
- * Copyright (C) 2012-2013, Symisc Systems http://jx9.symisc.net/
- * Version 1.7.2
- * For information on licensing, redistribution of this file, and for a DISCLAIMER OF ALL WARRANTIES
- * please contact Symisc Systems via:
+ * Symisc JX9: 一个基于 JSON 的高效嵌入式脚本引擎。
+ * 版权所有 (C) 2012-2013, Symisc Systems http://jx9.symisc.net/
+ * 版本 1.7.2
+ * 有关许可信息、redistrib免责声明，请通过以下方式联系 Symisc Systems：
  *       legal@symisc.net
  *       licensing@symisc.net
  *       contact@symisc.net
- * or visit:
+ * 或访问：
  *      http://jx9.symisc.net/
  */
- /* $SymiscID: json.c v1.0 FreeBSD 2012-12-16 00:28 stable <chm@symisc.net> $ */
+/* $SymiscID: json.c v1.0 FreeBSD 2012-12-16 00:28 stable <chm@symisc.net> $ */
 #ifndef JX9_AMALGAMATION
 #include "jx9Int.h"
 #endif
-/* This file deals with JSON serialization, decoding and stuff like that. */
+/* 本文件处理 JSON 序列化、解码及相关功能。 */
 /*
- * Section: 
- *  JSON encoding/decoding routines.
- * Authors:
+ * 章节：
+ *  JSON 编码/解码例程。
+ * 作者：
  *  Symisc Systems, devel@symisc.net.
- *  Copyright (C) Symisc Systems, http://jx9.symisc.net
- * Status:
- *    Devel.
+ *  版权所有 (C) Symisc Systems, http://jx9.symisc.net
+ * 状态：
+ *    开发中。
  */
-/* Forward reference */
+/* 前向引用 */
 static int VmJsonArrayEncode(jx9_value *pKey, jx9_value *pValue, void *pUserData);
 static int VmJsonObjectEncode(jx9_value *pKey, jx9_value *pValue, void *pUserData);
 /* 

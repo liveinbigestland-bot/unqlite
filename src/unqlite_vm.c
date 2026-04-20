@@ -1,25 +1,24 @@
 /*
- * Symisc unQLite: An Embeddable NoSQL (Post Modern) Database Engine.
- * Copyright (C) 2012-2013, Symisc Systems http://unqlite.org/
- * Version 1.1.6
- * For information on licensing, redistribution of this file, and for a DISCLAIMER OF ALL WARRANTIES
- * please contact Symisc Systems via:
+ * Symisc unQLite: 一个嵌入式 NoSQL（后现代）数据库引擎。
+ * 版权所有 (C) 2012-2013, Symisc Systems http://unqlite.org/
+ * 版本 1.1.6
+ * 有关许可协议、再分发和免责声明的详细信息，请联系 Symisc Systems：
  *       legal@symisc.net
  *       licensing@symisc.net
  *       contact@symisc.net
- * or visit:
+ * 或访问：
  *      http://unqlite.org/licensing.html
  */
- /* $SymiscID: unqlite_vm.c v1.0 Win7 2013-01-29 23:37 stable <chm@symisc.net> $ */
+/* $SymiscID: unqlite_vm.c v1.0 Win7 2013-01-29 23:37 stable <chm@symisc.net> $ */
 #ifndef UNQLITE_AMALGAMATION
 #include "unqliteInt.h"
 #endif
-/* This file deals with low level stuff related to the unQLite Virtual Machine */
+/* 本文件处理与 unQLite 虚拟机相关的底层操作 */
 
-/* Record ID as a hash value */
+/* 记录 ID 作为哈希值 */
 #define COL_RECORD_HASH(RID) (RID)
 /*
- * Fetch a record from a given collection.
+ * 从给定集合中获取记录。
  */
 static unqlite_col_record * CollectionCacheFetchRecord(
 	unqlite_col *pCol, /* Target collection */

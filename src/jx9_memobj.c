@@ -1,35 +1,31 @@
 /*
- * Symisc JX9: A Highly Efficient Embeddable Scripting Engine Based on JSON.
- * Copyright (C) 2012-2013, Symisc Systems http://jx9.symisc.net/
- * Version 1.7.2
- * For information on licensing, redistribution of this file, and for a DISCLAIMER OF ALL WARRANTIES
- * please contact Symisc Systems via:
+ * Symisc JX9: 一个基于 JSON 的高效嵌入式脚本引擎。
+ * 版权所有 (C) 2012-2013, Symisc Systems http://jx9.symisc.net/
+ * 版本 1.7.2
+ * 有关许可协议、再分发和免责声明的详细信息，请联系 Symisc Systems：
  *       legal@symisc.net
  *       licensing@symisc.net
  *       contact@symisc.net
- * or visit:
+ * 或访问：
  *      http://jx9.symisc.net/
  */
- /* $SymiscID: memobj.c v2.7 FreeBSD 2012-08-09 03:40 stable <chm@symisc.net> $ */
+/* $SymiscID: memobj.c v2.7 FreeBSD 2012-08-09 03:40 stable <chm@symisc.net> $ */
 #ifndef JX9_AMALGAMATION
 #include "jx9Int.h"
 #endif
-/* This file manage low-level stuff related to indexed memory objects [i.e: jx9_value] */
+/* 本文件管理与索引内存对象 [即: jx9_value] 相关的底层操作 */
 /*
- * Notes on memory objects [i.e: jx9_value].
- * Internally, the JX9 virtual machine manipulates nearly all JX9 values
- * [i.e: string, int, float, resource, object, bool, null..] as jx9_values structures.
- * Each jx9_values struct may cache multiple representations (string, 
- * integer etc.) of the same value.
+ * 关于内存对象的说明 [即: jx9_value]。
+ * 在内部，JX9 虚拟机将几乎所有的 JX9 值
+ * [即: 字符串、整型、浮点型、资源、对象、布尔型、空值..] 作为 jx9_values 结构进行操作。
+ * 每个 jx9_values 结构可以缓存同一值的多个表示（字符串、整数等）。
  */
 /*
- * Convert a 64-bit IEEE double into a 64-bit signed integer.
- * If the double is too large, return 0x8000000000000000.
+ * 将 64 位 IEEE 双精度浮点数转换为 64 位有符号整数。
+ * 如果双精度数太大，则返回 0x8000000000000000。
  *
- * Most systems appear to do this simply by assigning ariables and without
- * the extra range tests.
- * But there are reports that windows throws an expection if the floating 
- * point value is out of range.
+ * 大多数系统似乎只需通过赋值变量即可完成此操作，无需额外的范围测试。
+ * 但有报告称 Windows 在浮点值超出范围时会抛出异常。
  */
 static sxi64 MemObjRealToInt(jx9_value *pObj)
 {

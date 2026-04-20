@@ -1,13 +1,12 @@
 /*
- * Symisc JX9: A Highly Efficient Embeddable Scripting Engine Based on JSON.
- * Copyright (C) 2012-2013, Symisc Systems http://jx9.symisc.net/
- * Version 1.7.2
- * For information on licensing, redistribution of this file, and for a DISCLAIMER OF ALL WARRANTIES
- * please contact Symisc Systems via:
+ * Symisc JX9: 一个基于 JSON 的高效嵌入式脚本引擎。
+ * 版权所有 (C) 2012-2013, Symisc Systems http://jx9.symisc.net/
+ * 版本 1.7.2
+ * 有关许可协议、再分发和免责声明的详细信息，请联系 Symisc Systems：
  *       legal@symisc.net
  *       licensing@symisc.net
  *       contact@symisc.net
- * or visit:
+ * 或访问：
  *      http://jx9.symisc.net/
  */
  /* $SymiscID: jx9_vm.c v1.0 FreeBSD 2012-12-09 00:19 stable <chm@symisc.net> $ */
@@ -15,89 +14,82 @@
 #include "jx9Int.h"
 #endif
 /*
- * The code in this file implements execution method of the JX9 Virtual Machine.
- * The JX9 compiler (implemented in 'compiler.c' and 'parse.c') generates a bytecode program
- * which is then executed by the virtual machine implemented here to do the work of the JX9
- * statements.
- * JX9 bytecode programs are similar in form to assembly language. The program consists
- * of a linear sequence of operations .Each operation has an opcode and 3 operands.
- * Operands P1 and P2 are integers where the first is signed while the second is unsigned.
- * Operand P3 is an arbitrary pointer specific to each instruction. The P2 operand is usually
- * the jump destination used by the OP_JMP, OP_JZ, OP_JNZ, ... instructions.
- * Opcodes will typically ignore one or more operands. Many opcodes ignore all three operands.
- * Computation results are stored on a stack. Each entry on the stack is of type jx9_value.
- * JX9 uses the jx9_value object to represent all values that can be stored in a JX9 variable.
- * Since JX9 uses dynamic typing for the values it stores. Values stored in jx9_value objects
- * can be integers, floating point values, strings, arrays, object instances (object in the JX9 jargon)
- * and so on.
- * Internally, the JX9 virtual machine manipulates nearly all values as jx9_values structures.
- * Each jx9_value may cache multiple representations(string, integer etc.) of the same value.
- * An implicit conversion from one type to the other occurs as necessary.
- * Most of the code in this file is taken up by the [VmByteCodeExec()] function which does
- * the work of interpreting a JX9 bytecode program. But other routines are also provided
- * to help in building up a program instruction by instruction.
- */
+ * 此文件中的代码实现了 JX9 虚拟机的执行方法。
+ * JX9 编译器（在 'compiler.c' 和 'parse.c' 中实现）生成字节码程序，
+ * 然后由在此实现的虚拟机执行以完成 JX9 语句的工作。
+ * JX9 字节码程序类似于汇编语言的形式。程序由线性序列的操作组成。
+ * 每个操作都有一个操作码和 3 个操作数。操作数 P1 和 P2 是整数，
+ * 第一个是有符号的，第二个是无符号的。操作数 P3 是特定于每个指令的任意指针。
+ * P2 操作数通常是 OP_JMP、OP_JZ、OP_JNZ、... 指令使用的跳转目标。
+ * 操作码通常忽略一个或多个操作数。许多操作码忽略所有三个操作数。
+ * 计算结果存储在栈上。栈上的每个条目都是 jx9_value 类型。
+ * JX9 使用 jx9_value 对象来表示可以存储在 JX9 变量中的所有值。
+ * 由于 JX9 对其存储的值使用动态类型。存储在 jx9_value 对象中的值
+ * 可以是整数、浮点值、字符串、数组、对象实例（JX9 术语中的对象）等。
+ * 在内部，JX9 虚拟机将几乎所有值作为 jx9_values 结构进行操作。
+ * 每个 jx9_value 可以缓存同一值的多个表示（字符串、整数等）。
+ * 根据需要隐式执行从一个类型到另一个类型的转换。
+ * 此文件中的大部分代码由 [VmByteCodeExec()] 函数占用，该函数负责解释 JX9 字节码程序。
+ * 但也提供了其他例程来帮助逐条指令地构建程序。
+*/
 /*
- * Each active virtual machine frame is represented by an instance 
- * of the following structure.
- * VM Frame hold local variables and other stuff related to function call.
+ * 每个活动的虚拟机帧都由以下结构的实例表示。
+ * VM 帧保存与函数调用相关的局部变量和其他内容。
  */
 struct VmFrame
 {
-	VmFrame *pParent; /* Parent frame or NULL if global scope */
-	void *pUserData;  /* Upper layer private data associated with this frame */
-	SySet sLocal;     /* Local variables container (VmSlot instance) */
-	jx9_vm *pVm;      /* VM that own this frame */
-	SyHash hVar;      /* Variable hashtable for fast lookup */
-	SySet sArg;       /* Function arguments container */
-	sxi32 iFlags;     /* Frame configuration flags (See below)*/
-	sxu32 iExceptionJump; /* Exception jump destination */
+	VmFrame *pParent; /* 父帧，如果是全局作用域则为 NULL */
+	void *pUserData;  /* 与此帧关联的上层私有数据 */
+	SySet sLocal;     /* 局部变量容器（VmSlot 实例）*/
+	jx9_vm *pVm;      /* 拥有此帧的 VM */
+	SyHash hVar;      /* 用于快速查找的变量哈希表 */
+	SySet sArg;       /* 函数参数容器 */
+	sxi32 iFlags;     /* 帧配置标志（见下文）*/
+	sxu32 iExceptionJump; /* 异常跳转目标 */
 };
 /*
- * When a user defined variable is  garbage collected, memory object index
- * is stored in an instance of the following structure and put in the free object
- * table so that it can be reused again without allocating a new memory object.
+ * 当用户定义的变量被垃圾回收时，内存对象索引存储在以下结构的实例中，
+ * 并放入空闲对象表中，以便可以重复使用而无需分配新的内存对象。
  */
 typedef struct VmSlot VmSlot;
 struct VmSlot
 {
-	sxu32 nIdx;      /* Index in pVm->aMemObj[] */ 
-	void *pUserData; /* Upper-layer private data */
+	sxu32 nIdx;      /* pVm->aMemObj[] 中的索引 */ 
+	void *pUserData; /* 上层私有数据 */
 };
 /*
- * Each parsed URI is recorded and stored in an instance of the following structure.
- * This structure and it's related routines are taken verbatim from the xHT project
- * [A modern embeddable HTTP engine implementing all the RFC2616 methods]
- * the xHT project is developed internally by Symisc Systems.
+ * 每个解析的 URI 都记录并存储在以下结构的实例中。
+ * 此结构及其相关例程完全取自 xHT 项目
+ * [一个实现所有 RFC2616 方法的现代嵌入式 HTTP 引擎]
+ * xHT 项目由 Symisc Systems 内部开发。
  */
 typedef struct SyhttpUri SyhttpUri;
 struct SyhttpUri 
 { 
-	SyString sHost;     /* Hostname or IP address */ 
-	SyString sPort;     /* Port number */ 
-	SyString sPath;     /* Mandatory resource path passed verbatim (Not decoded) */ 
-	SyString sQuery;    /* Query part */	 
-	SyString sFragment; /* Fragment part */ 
-	SyString sScheme;   /* Scheme */ 
-	SyString sUser;     /* Username */ 
-	SyString sPass;     /* Password */
-	SyString sRaw;      /* Raw URI */
+	SyString sHost;     /* 主机名或 IP 地址 */ 
+	SyString sPort;     /* 端口号 */ 
+	SyString sPath;     /* 按原样传递的必需资源路径（未解码）*/ 
+	SyString sQuery;    /* 查询部分 */	 
+	SyString sFragment; /* 片段部分 */ 
+	SyString sScheme;   /* 方案 */ 
+	SyString sUser;     /* 用户名 */ 
+	SyString sPass;     /* 密码 */
+	SyString sRaw;      /* 原始 URI */
 };
 /* 
- * An instance of the following structure is used to record all MIME headers seen
- * during a HTTP interaction. 
- * This structure and it's related routines are taken verbatim from the xHT project
- * [A modern embeddable HTTP engine implementing all the RFC2616 methods]
- * the xHT project is developed internally by Symisc Systems.
+ * 以下结构的实例用于记录 HTTP 交互期间看到的所有 MIME 头。
+ * 此结构及其相关例程完全取自 xHT 项目
+ * [一个实现所有 RFC2616 方法的现代嵌入式 HTTP 引擎]
+ * xHT 项目由 Symisc Systems 内部开发。
  */  
 typedef struct SyhttpHeader SyhttpHeader;
 struct SyhttpHeader 
 { 
-	SyString sName;    /* Header name [i.e:"Content-Type", "Host", "User-Agent"]. NOT NUL TERMINATED */ 
-	SyString sValue;   /* Header values [i.e: "text/html"]. NOT NUL TERMINATED */ 
+	SyString sName;    /* 头名称 [即:"Content-Type", "Host", "User-Agent"]。非 NUL 终止 */ 
+	SyString sValue;   /* 头值 [即: "text/html"]。非 NUL 终止 */ 
 };
 /*
- * Supported HTTP methods.
+ * 支持的 HTTP 方法。
  */
 #define HTTP_METHOD_GET  1 /* GET */
 #define HTTP_METHOD_HEAD 2 /* HEAD */

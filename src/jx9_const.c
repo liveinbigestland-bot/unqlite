@@ -1,29 +1,28 @@
 /*
- * Symisc JX9: A Highly Efficient Embeddable Scripting Engine Based on JSON.
- * Copyright (C) 2012-2013, Symisc Systems http://jx9.symisc.net/
- * Version 1.7.2
- * For information on licensing, redistribution of this file, and for a DISCLAIMER OF ALL WARRANTIES
- * please contact Symisc Systems via:
+ * Symisc JX9: 一个基于 JSON 的高效嵌入式脚本引擎。
+ * 版权所有 (C) 2012-2013, Symisc Systems http://jx9.symisc.net/
+ * 版本 1.7.2
+ * 有关许可信息、redistrib免责声明，请通过以下方式联系 Symisc Systems：
  *       legal@symisc.net
  *       licensing@symisc.net
  *       contact@symisc.net
- * or visit:
+ * 或访问：
  *      http://jx9.symisc.net/
  */
- /* $SymiscID: const.c v1.7 Win7 2012-12-13 00:01 stable <chm@symisc.net> $ */
+/* $SymiscID: const.c v1.7 Win7 2012-12-13 00:01 stable <chm@symisc.net> $ */
 #ifndef JX9_AMALGAMATION
 #include "jx9Int.h"
 #endif
-/* This file implement built-in constants for the JX9 engine. */
+/* 本文件实现 JX9 引擎的内置常量。 */
 /*
  * JX9_VERSION
  * __JX9__
- *   Expand the current version of the JX9 engine.
+ *   展开 JX9 引擎的当前版本。
  */
 static void JX9_VER_Const(jx9_value *pVal, void *pUnused)
 {
 	SXUNUSED(pUnused);
-	jx9_value_string(pVal, jx9_lib_signature(), -1/*Compute length automatically*/);
+	jx9_value_string(pVal, jx9_lib_signature(), -1/*自动计算长度*/);
 }
 #ifdef __WINNT__
 #include <Windows.h>
@@ -33,7 +32,7 @@ static void JX9_VER_Const(jx9_value *pVal, void *pUnused)
 /*
  * JX9_OS
  * __OS__
- *  Expand the name of the host Operating System.
+ *  展开主机操作系统的名称。
  */
 static void JX9_OS_Const(jx9_value *pVal, void *pUnused)
 {
@@ -175,7 +174,7 @@ static void JX9_FILE_Const(jx9_value *pVal, void *pUserData)
 }
 /*
  * __DIR__
- *  Directory holding the processed script.
+ *  包含已处理脚本的目录。
  */
 static void JX9_DIR_Const(jx9_value *pVal, void *pUserData)
 {

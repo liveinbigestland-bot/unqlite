@@ -1,23 +1,22 @@
 /*
- * Symisc JX9: A Highly Efficient Embeddable Scripting Engine Based on JSON.
- * Copyright (C) 2012-2013, Symisc Systems http://jx9.symisc.net/
- * Version 1.7.2
- * For information on licensing, redistribution of this file, and for a DISCLAIMER OF ALL WARRANTIES
- * please contact Symisc Systems via:
+ * Symisc JX9: 一个基于 JSON 的高效嵌入式脚本引擎。
+ * 版权所有 (C) 2012-2013, Symisc Systems http://jx9.symisc.net/
+ * 版本 1.7.2
+ * 有关许可协议、再分发和免责声明的详细信息，请联系 Symisc Systems：
  *       legal@symisc.net
  *       licensing@symisc.net
  *       contact@symisc.net
- * or visit:
+ * 或访问：
  *      http://jx9.symisc.net/
  */
- /* $SymiscID: lib.c v5.1 Win7 2012-08-08 04:19 stable <chm@symisc.net> $ */
+/* $SymiscID: lib.c v5.1 Win7 2012-08-08 04:19 stable <chm@symisc.net> $ */
 /*
- * Symisc Run-Time API: A modern thread safe replacement of the standard libc
- * Copyright (C) Symisc Systems 2007-2012, http://www.symisc.net/
+ * Symisc Run-Time API: 标准 libc 的现代线程安全替代品
+ * 版权所有 (C) Symisc Systems 2007-2012, http://www.symisc.net/
  *
- * The Symisc Run-Time API is an independent project developed by symisc systems
- * internally as a secure replacement of the standard libc.
- * The library is re-entrant, thread-safe and platform independent.
+ * Symisc Run-Time API 是 Symisc Systems 内部开发的独立项目，
+ * 作为标准 libc 的安全替代品。
+ * 该库是可重入的、线程安全的且平台独立的。
  */
 #ifndef JX9_AMALGAMATION
 #include "jx9Int.h"

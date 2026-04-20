@@ -1,41 +1,36 @@
 /*
- * Symisc unQLite: An Embeddable NoSQL (Post Modern) Database Engine.
- * Copyright (C) 2012-2013, Symisc Systems http://unqlite.org/
- * Version 1.1.6
- * For information on licensing, redistribution of this file, and for a DISCLAIMER OF ALL WARRANTIES
- * please contact Symisc Systems via:
+ * Symisc unQLite: 一个嵌入式 NoSQL（后现代）数据库引擎。
+ * 版权所有 (C) 2012-2013, Symisc Systems http://unqlite.org/
+ * 版本 1.1.6
+ * 有关许可协议、再分发和免责声明的详细信息，请联系 Symisc Systems：
  *       legal@symisc.net
  *       licensing@symisc.net
  *       contact@symisc.net
- * or visit:
+ * 或访问：
  *      http://unqlite.org/licensing.html
  */
- /* $SymiscID: os_unix.c v1.3 FreeBSD 2013-04-05 01:10 devel <chm@symisc.net> $ */
+/* $SymiscID: os_unix.c v1.3 FreeBSD 2013-04-05 01:10 devel <chm@symisc.net> $ */
 #ifndef UNQLITE_AMALGAMATION
 #include "unqliteInt.h"
 #endif
-/* 
- * Omit the whole layer from the build if compiling for platforms other than Unix (Linux, BSD, Solaris, OS X, etc.).
- * Note: Mostly SQLite3 source tree.
+/*
+ * 如果不是为 Unix 类平台（Linux、BSD、Solaris、OS X 等）编译，则从构建中省略整个层。
+ * 注：主要参考 SQLite3 源代码树。
  */
 #if defined(__UNIXES__)
-/** This file contains the VFS implementation for unix-like operating systems
-** include Linux, MacOSX, *BSD, QNX, VxWorks, AIX, HPUX, and others.
+/** 本文件包含适用于类 Unix 操作系统的 VFS 实现
+** 包括 Linux、MacOSX、*BSD、QNX、VxWorks、AIX、HPUX 等。
 **
-** There are actually several different VFS implementations in this file.
-** The differences are in the way that file locking is done.  The default
-** implementation uses Posix Advisory Locks.  Alternative implementations
-** use flock(), dot-files, various proprietary locking schemas, or simply
-** skip locking all together.
+** 实际上，此文件中有几种不同的 VFS 实现。
+** 区别在于文件锁定的方式。默认实现使用 Posix Advisory Locks。
+** 替代实现使用 flock()、点文件、各种专有锁定方案，或者完全跳过锁定。
 **
-** This source file is organized into divisions where the logic for various
-** subfunctions is contained within the appropriate division.  PLEASE
-** KEEP THE STRUCTURE OF THIS FILE INTACT.  New code should be placed
-** in the correct division and should be clearly labeled.
+** 本源代码文件按划分组织，各个子函数的逻辑位于相应的划分中。
+** 请勿破坏此文件的结构。新代码应放在正确的划分中，并应清楚标注。
 **
 */
 /*
-** standard include files.
+** 标准头文件。
 */
 #include <sys/types.h>
 #include <sys/stat.h>

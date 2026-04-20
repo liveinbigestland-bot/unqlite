@@ -1,56 +1,53 @@
 /*
- * Symisc unQLite: An Embeddable NoSQL (Post Modern) Database Engine.
- * Copyright (C) 2012-2013, Symisc Systems http://unqlite.org/
- * Version 1.1.6
- * For information on licensing, redistribution of this file, and for a DISCLAIMER OF ALL WARRANTIES
- * please contact Symisc Systems via:
+ * Symisc unQLite: 一个嵌入式 NoSQL（后现代）数据库引擎。
+ * 版权所有 (C) 2012-2013, Symisc Systems http://unqlite.org/
+ * 版本 1.1.6
+ * 有关许可协议、再分发和免责声明的详细信息，请联系 Symisc Systems：
  *       legal@symisc.net
  *       licensing@symisc.net
  *       contact@symisc.net
- * or visit:
+ * 或访问：
  *      http://unqlite.org/licensing.html
  */
  /* $SymiscID: api.c v2.0 FreeBSD 2012-11-08 23:07 stable <chm@symisc.net> $ */
 #ifndef UNQLITE_AMALGAMATION
 #include "unqliteInt.h"
 #endif
-/* This file implement the public interfaces presented to host-applications.
- * Routines in other files are for internal use by UnQLite and should not be
- * accessed by users of the library.
+/* 此文件实现了向主机应用程序提供的公共接口。
+ * 其他文件中的例程供 UnQLite 内部使用，不应被
+ * 库的用户访问。
  */
 #define UNQLITE_DB_MISUSE(DB) (DB == 0 || DB->nMagic != UNQLITE_DB_MAGIC)
 #define UNQLITE_VM_MISUSE(VM) (VM == 0 || VM->nMagic == JX9_VM_STALE)
-/* If another thread have released a working instance, the following macros
- * evaluates to true. These macros are only used when the library
- * is built with threading support enabled.
+/* 如果另一个线程已释放工作实例，以下宏计算为 true。
+ * 这些宏仅在库启用线程支持构建时使用。
  */
 #define UNQLITE_THRD_DB_RELEASE(DB) (DB->nMagic != UNQLITE_DB_MAGIC)
 #define UNQLITE_THRD_VM_RELEASE(VM) (VM->nMagic == JX9_VM_STALE)
 /* IMPLEMENTATION: unqlite@embedded@symisc 118-09-4785 */
 /*
- * All global variables are collected in the structure named "sUnqlMPGlobal".
- * That way it is clear in the code when we are using static variable because
- * its name start with sUnqlMPGlobal.
+ * 所有全局变量都收集在名为 "sUnqlMPGlobal" 的结构中。
+ * 这样，当我们在代码中使用静态变量时就很清楚，因为它的名称以 sUnqlMPGlobal 开头。
  */
 static struct unqlGlobal_Data
 {
-	SyMemBackend sAllocator;                /* Global low level memory allocator */
+	SyMemBackend sAllocator;                /* 全局低层内存分配器 */
 #if defined(UNQLITE_ENABLE_THREADS)
-	const SyMutexMethods *pMutexMethods;   /* Mutex methods */
-	SyMutex *pMutex;                       /* Global mutex */
-	sxu32 nThreadingLevel;                 /* Threading level: 0 == Single threaded/1 == Multi-Threaded 
-										    * The threading level can be set using the [unqlite_lib_config()]
-											* interface with a configuration verb set to
-											* UNQLITE_LIB_CONFIG_THREAD_LEVEL_SINGLE or 
-											* UNQLITE_LIB_CONFIG_THREAD_LEVEL_MULTI
+	const SyMutexMethods *pMutexMethods;   /* 互斥方法 */
+	SyMutex *pMutex;                       /* 全局互斥 */
+	sxu32 nThreadingLevel;                 /* 线程级别：0 == 单线程/1 == 多线程 
+										    * 线程级别可以使用 [unqlite_lib_config()]
+											* 接口并通过将配置动词设置为
+											* UNQLITE_LIB_CONFIG_THREAD_LEVEL_SINGLE 或 
+											* UNQLITE_LIB_CONFIG_THREAD_LEVEL_MULTI 来设置
 											*/
 #endif
-	SySet kv_storage;                      /* Installed KV storage engines */
-	int iPageSize;                         /* Default Page size */
-	unqlite_vfs *pVfs;                     /* Underlying virtual file system (Vfs) */
-	sxi32 nDB;                             /* Total number of active DB handles */
-	unqlite *pDB;                          /* List of active DB handles */
-	sxu32 nMagic;                          /* Sanity check against library misuse */
+	SySet kv_storage;                      /* 已安装的 KV 存储引擎 */
+	int iPageSize;                         /* 默认页面大小 */
+	unqlite_vfs *pVfs;                     /* 底层虚拟文件系统 (Vfs) */
+	sxi32 nDB;                             /* 活动 DB 句柄的总数 */
+	unqlite *pDB;                          /* 活动 DB 句柄的列表 */
+	sxu32 nMagic;                          /* 对库误用的完整性检查 */
 }sUnqlMPGlobal = {
 	{0, 0, 0, 0, 0, 0, 0, 0, {0}}, 
 #if defined(UNQLITE_ENABLE_THREADS)
@@ -68,31 +65,29 @@ static struct unqlGlobal_Data
 #define UNQLITE_LIB_MAGIC  0xEA1495BA
 #define UNQLITE_LIB_MISUSE (sUnqlMPGlobal.nMagic != UNQLITE_LIB_MAGIC)
 /*
- * Supported threading level.
- * These options have meaning only when the library is compiled with multi-threading
- * support. That is, the UNQLITE_ENABLE_THREADS compile time directive must be defined
- * when UnQLite is built.
+ * 支持的线程级别。
+ * 这些选项仅在库使用多线程支持编译时才有意义。
+ * 即，在构建 UnQLite 时必须定义 UNQLITE_ENABLE_THREADS 编译时指令。
  * UNQLITE_THREAD_LEVEL_SINGLE:
- *  In this mode, mutexing is disabled and the library can only be used by a single thread.
+ *  在此模式下，互斥被禁用，库只能由单个线程使用。
  * UNQLITE_THREAD_LEVEL_MULTI
- *  In this mode, all mutexes including the recursive mutexes on [unqlite] objects
- *  are enabled so that the application is free to share the same database handle
- *  between different threads at the same time.
+ *  在此模式下，包括 [unqlite] 对象上的递归互斥在内的所有互斥都被启用，
+ *  因此应用程序可以自由地在不同线程之间同时共享相同的数据库句柄。
  */
 #define UNQLITE_THREAD_LEVEL_SINGLE 1 
 #define UNQLITE_THREAD_LEVEL_MULTI  2
 /*
- * Find a Key Value storage engine from the set of installed engines.
- * Return a pointer to the storage engine methods on success. NULL on failure.
+ * 从已安装引擎集合中查找键值存储引擎。
+ * 成功时返回指向存储引擎方法的指针。失败时返回 NULL。
  */
 UNQLITE_PRIVATE unqlite_kv_methods * unqliteFindKVStore(
-	const char *zName, /* Storage engine name [i.e. Hash, B+tree, LSM, etc.] */
-	sxu32 nByte /* zName length */
+	const char *zName, /* 存储引擎名称 [即 Hash, B+tree, LSM, 等] */
+	sxu32 nByte /* zName 长度 */
 	)
 {
 	unqlite_kv_methods **apStore,*pEntry;
 	sxu32 n,nMax;
-	/* Point to the set of installed engines */
+	/* 指向已安装引擎的集合 */
 	apStore = (unqlite_kv_methods **)SySetBasePtr(&sUnqlMPGlobal.kv_storage);
 	nMax = SySetUsed(&sUnqlMPGlobal.kv_storage);
 	for( n = 0 ; n < nMax; ++n ){
@@ -266,14 +261,12 @@ int unqlite_lib_config(int nConfigOp,...)
 	return rc;
 }
 /*
- * Global library initialization
- * Refer to [unqlite_lib_init()]
- * This routine must be called to initialize the memory allocation subsystem, the mutex 
- * subsystem prior to doing any serious work with the library. The first thread to call
- * this routine does the initialization process and set the magic number so no body later
- * can re-initialize the library. If subsequent threads call this  routine before the first
- * thread have finished the initialization process, then the subsequent threads must block 
- * until the initialization process is done.
+ * 全局库初始化
+ * 请参阅 [unqlite_lib_init()]
+ * 在使用库进行任何重要工作之前，必须调用此例程来初始化内存分配子系统和互斥
+ * 子系统。第一个调用此例程的线程执行初始化过程并设置幻数，以便之后没有人
+ * 可以重新初始化库。如果后续线程在第一个线程完成初始化过程之前调用此例程，
+ * 则后续线程必须阻塞直到初始化过程完成。
  */
 static sxi32 unqliteCoreInitialize(void)
 {

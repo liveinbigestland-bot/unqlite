@@ -1,97 +1,77 @@
-/* This file was automatically generated.  Do not edit (Except for compile time directives)! */ 
+/* 本文件由自动生成。请勿修改（编译时指令除外）！*/
 #ifndef _UNQLITE_H_
 #define _UNQLITE_H_
-/* Make sure we can call this stuff from C++ */
+/* 确保可以从 C++ 调用这些内容 */
 #ifdef __cplusplus
  extern "C" {
 #endif 
 /*
- * Symisc UnQLite: An Embeddable NoSQL (Post Modern) Database Engine.
- * Copyright (C) 2012-2019, Symisc Systems http://unqlite.org/
- * Version 1.1.9
- * For information on licensing, redistribution of this file, and for a DISCLAIMER OF ALL WARRANTIES
- * please contact Symisc Systems via:
+ * Symisc UnQLite: 一个嵌入式 NoSQL（后现代）数据库引擎。
+ * 版权所有 (C) 2012-2019, Symisc Systems http://unqlite.org/
+ * 版本 1.1.9
+ * 有关许可协议、再分发和免责声明的详细信息，请联系 Symisc Systems：
  *       legal@symisc.net
  *       licensing@symisc.net
  *       contact@symisc.net
- * or visit:
+ * 或访问：
  *      http://unqlite.org/licensing.html
  */
 /*
- * Copyright (C) 2012, 2019 Symisc Systems, S.U.A.R.L [M.I.A.G Mrad Chems Eddine <chm@symisc.net>].
- * All rights reserved.
+ * 版权所有 (C) 2012, 2019 Symisc Systems, S.U.A.R.L [M.I.A.G Mrad Chems Eddine <chm@symisc.net>]。
+ * 保留所有权利。
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
+ * 在满足以下条件的前提下，允许以源代码和二进制形式重新分发和使用：
+ * 1. 源代码的分发必须保留上述版权声明、本条件列表和以下免责声明。
+ * 2. 二进制形式的分发必须在提供的文档和/或其他材料中重现上述版权
+ *    声明、本条件列表和以下免责声明。
  *
- * THIS SOFTWARE IS PROVIDED BY SYMISC SYSTEMS ``AS IS'' AND ANY EXPRESS
- * OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, OR
- * NON-INFRINGEMENT, ARE DISCLAIMED.  IN NO EVENT SHALL SYMISC SYSTEMS
- * BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR
- * BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, 
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
- * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
- * IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * 本软件按"原样"提供，SYMISC SYSTEMS 不做任何明示或暗示的保证，
+ * 包括但不限于对适销性、特定用途适用性和非侵权性的保证。在任何情况下，
+ * SYMISC SYSTEMS 均不对任何直接、间接、偶然、特殊、惩戒性或后果性
+ * 损害（包括但不限于替代商品或服务的采购、使用、数据丢失、利润损失
+ * 或业务中断）承担责任，无论何种原因导致，即使已被告知可能发生此类损害。
  */
  /* $SymiscID: unqlite.h v1.3 Win10 2108-04-27 02:35:11 stable <chm@symisc.net>  $ */
-#include <stdarg.h> /* needed for the definition of va_list */
+#include <stdarg.h> /* va_list 定义所需 */
 /*
- * Compile time engine version, signature, identification in the symisc source tree
- * and copyright notice.
- * Each macro have an equivalent C interface associated with it that provide the same
- * information but are associated with the library instead of the header file.
- * Refer to [unqlite_lib_version()], [unqlite_lib_signature()], [unqlite_lib_ident()] and
- * [unqlite_lib_copyright()] for more information.
+ * 编译时引擎版本、签名、Symisc 源码树中的标识和版权声明。
+ * 每个宏都有对应的 C 接口函数，提供相同的信息，但与库关联而非头文件。
+ * 请参阅 [unqlite_lib_version()]、[unqlite_lib_signature()]、[unqlite_lib_ident()] 和
+ * [unqlite_lib_copyright()] 了解更多信息。
  */
 /*
- * The UNQLITE_VERSION C preprocessor macro evaluates to a string literal
- * that is the unqlite version in the format "X.Y.Z" where X is the major
- * version number and Y is the minor version number and Z is the release
- * number.
+ * UNQLITE_VERSION 预处理器宏计算为一个字符串字面量，
+ * 格式为 "X.Y.Z"，其中 X 为主版本号，Y 为次版本号，Z 为发布版本号。
  */
 #define UNQLITE_VERSION "1.1.9"
 /*
- * The UNQLITE_VERSION_NUMBER C preprocessor macro resolves to an integer
- * with the value (X*1000000 + Y*1000 + Z) where X, Y, and Z are the same
- * numbers used in [UNQLITE_VERSION].
+ * UNQLITE_VERSION_NUMBER 预处理器宏解析为一个整数值 (X*1000000 + Y*1000 + Z)，
+ * 其中 X、Y 和 Z 与 [UNQLITE_VERSION] 中使用的数字相同。
  */
 #define UNQLITE_VERSION_NUMBER 1001009
 /*
- * The UNQLITE_SIG C preprocessor macro evaluates to a string
- * literal which is the public signature of the unqlite engine.
- * This signature could be included for example in a host-application
- * generated Server MIME header as follows:
+ * UNQLITE_SIG 预处理器宏计算为字符串字面量，表示 unqlite 引擎的公共签名。
+ * 此签名可包含在主机应用程序生成的 Server MIME 头中，如下所示：
  *   Server: YourWebServer/x.x unqlite/x.x.x \r\n
  */
 #define UNQLITE_SIG "unqlite/1.1.9"
 /*
- * UnQLite identification in the Symisc source tree:
- * Each particular check-in of a particular software released
- * by symisc systems have an unique identifier associated with it.
- * This macro hold the one associated with unqlite.
+ * UnQLite 在 Symisc 源码树中的标识：
+ * Symisc Systems 发布的每个软件版本都有唯一的标识符。
+ * 此宏保存与 unqlite 关联的标识符。
  */
 #define UNQLITE_IDENT "unqlite:29c173b1-ac2c-4b49-93ba-e600619e304e"
 /*
- * Copyright notice.
- * If you have any questions about the licensing situation, please
- * visit http://unqlite.org/licensing.html
- * or contact Symisc Systems via:
+ * 版权声明。
+ * 如有关于许可协议的问题，请访问 http://unqlite.org/licensing.html
+ * 或联系 Symisc Systems：
  *   legal@symisc.net
  *   licensing@symisc.net
  *   contact@symisc.net
  */
-#define UNQLITE_COPYRIGHT "Copyright (C) Symisc Systems, S.U.A.R.L [Mrad Chems Eddine <chm@symisc.net>] 2012-2019, http://unqlite.org/"
+#define UNQLITE_COPYRIGHT "版权所有 (C) Symisc Systems, S.U.A.R.L [Mrad Chems Eddine <chm@symisc.net>] 2012-2019, http://unqlite.org/"
 
-/* Forward declaration to public objects */
+/* 公共对象的前向声明 */
 typedef struct unqlite_io_methods unqlite_io_methods;
 typedef struct unqlite_kv_methods unqlite_kv_methods;
 typedef struct unqlite_kv_engine unqlite_kv_engine;
@@ -103,73 +83,64 @@ typedef struct unqlite_vm unqlite_vm;
 typedef struct unqlite unqlite;
 /*
  * ------------------------------
- * Compile time directives
+ * 编译时指令
  * ------------------------------
- * For most purposes, UnQLite can be built just fine using the default compilation options.
- * However, if required, the compile-time options documented below can be used to omit UnQLite
- * features (resulting in a smaller compiled library size) or to change the default values
- * of some parameters.
- * Every effort has been made to ensure that the various combinations of compilation options
- * work harmoniously and produce a working library.
+ * 在大多数情况下，UnQLite 可以使用默认编译选项正常构建。
+ * 但是，如果需要，可以使用以下文档化的编译时选项来省略 UnQLite
+ * 的某些功能（从而减小编译后的库大小）或更改某些参数的默认值。
+ * 已尽一切努力确保各种编译选项组合能够协调工作并产生可用的库。
  *
  * UNQLITE_ENABLE_THREADS
- *  This option controls whether or not code is included in UnQLite to enable it to operate
- *  safely in a multithreaded environment. The default is not. All mutexing code is omitted
- *  and it is unsafe to use UnQLite in a multithreaded program. When compiled with the
- *  UNQLITE_ENABLE_THREADS directive enabled, UnQLite can be used in a multithreaded program
- *  and it is safe to share the same virtual machine and engine handle between two or more threads.
- *  The value of UNQLITE_ENABLE_THREADS can be determined at run-time using the unqlite_lib_is_threadsafe()
- *  interface.
- *  When UnQLite has been compiled with threading support then the threading mode can be altered
- * at run-time using the unqlite_lib_config() interface together with one of these verbs:
+ *  此选项控制是否在 UnQLite 中包含代码以使其能够在线程安全的环境中运行。
+ *  默认是不包含。所有互斥代码都被省略，在多线程程序中使用 UnQLite 是不安全的。
+ *  当使用 UNQLITE_ENABLE_THREADS 指令启用编译时，UnQLite 可以用于多线程程序，
+ *  并且可以安全地在两个或更多线程之间共享相同的虚拟机和引擎句柄。
+ *  UNQLITE_ENABLE_THREADS 的值可以使用 unqlite_lib_is_threadsafe() 接口在运行时确定。
+ *  当 UnQLite 已使用线程支持编译时，可以使用 unqlite_lib_config() 接口以及以下动词之一
+ *  来更改线程模式：
  *    UNQLITE_LIB_CONFIG_THREAD_LEVEL_SINGLE
  *    UNQLITE_LIB_CONFIG_THREAD_LEVEL_MULTI
- *  Platforms others than Windows and UNIX systems must install their own mutex subsystem via 
- *  unqlite_lib_config() with a configuration verb set to UNQLITE_LIB_CONFIG_USER_MUTEX.
- *  Otherwise the library is not threadsafe.
- *  Note that you must link UnQLite with the POSIX threads library under UNIX systems (i.e: -lpthread).
+ *  Windows 和 UNIX 系统以外的平台必须通过 unqlite_lib_config() 并将配置动词设置为
+ *  UNQLITE_LIB_CONFIG_USER_MUTEX 来安装自己的互斥子系统。否则库不是线程安全的。
+ *  注意，在 UNIX 系统下必须将 UnQLite 与 POSIX 线程库链接（即：-lpthread）。
  *
- * Options To Omit/Enable Features
+ * 功能省略/启用选项
  *
- * The following options can be used to reduce the size of the compiled library by omitting optional
- * features. This is probably only useful in embedded systems where space is especially tight, as even
- * with all features included the UnQLite library is relatively small. Don't forget to tell your
- * compiler to optimize for binary size! (the -Os option if using GCC). Telling your compiler
- * to optimize for size usually has a much larger impact on library footprint than employing
- * any of these compile-time options.
+ * 以下选项可用于通过省略可选功能来减小编译库的大小。这可能仅在空间特别紧张的
+ * 嵌入式系统中有用，因为即使包含所有功能，UnQLite 库也相对较小。
+ * 别忘了告诉编译器优化二进制大小！（如果使用 GCC，则为 -Os 选项）。
+ * 告诉编译器优化大小通常比使用这些编译时选项对库占用空间的影响更大。
  *
  * JX9_DISABLE_BUILTIN_FUNC
- *  Jx9 is shipped with more than 312 built-in functions suitable for most purposes like 
- *  string and INI processing, ZIP extracting, Base64 encoding/decoding, JSON encoding/decoding
- *  and so forth.
- *  If this directive is enabled, then all built-in Jx9 functions are omitted from the build.
- *  Note that special functions such as db_create(), db_store(), db_fetch(), etc. are not omitted
- *  from the build and are not affected by this directive.
+ *  Jx9 附带了 300 多个内置函数，适用于大多数用途，如字符串和 INI 处理、
+ *  ZIP 提取、Base64 编码/解码、JSON 编码/解码等。
+ *  如果启用此指令，则所有内置 Jx9 函数都将从构建中省略。
+ *  请注意，db_create()、db_store()、db_fetch() 等特殊函数不会从构建中省略，
+ *  也不受此指令的影响。
  *
  * JX9_ENABLE_MATH_FUNC
- *  If this directive is enabled, built-in math functions such as sqrt(), abs(), log(), ceil(), etc.
- *  are included in the build. Note that you may need to link UnQLite with the math library in same
- *  Linux/BSD flavor (i.e: -lm).
+ *  如果启用此指令，则内置数学函数（如 sqrt()、abs()、log()、ceil() 等）
+ *  将包含在构建中。注意，您可能需要在相同的 Linux/BSD 版本中将 UnQLite 与数学库链接
+ * （即：-lm）。
  *
  * JX9_DISABLE_DISK_IO
- *  If this directive is enabled, built-in VFS functions such as chdir(), mkdir(), chroot(), unlink(),
- *  sleep(), etc. are omitted from the build.
+ *  如果启用此指令，则内置 VFS 函数（如 chdir()、mkdir()、chroot()、unlink()、sleep() 等）
+ *  将从构建中省略。
  *
  * UNQLITE_ENABLE_JX9_HASH_IO
- * If this directive is enabled, built-in hash functions such as md5(), sha1(), md5_file(), crc32(), etc.
- * are included in the build.
+ * 如果启用此指令，则内置哈希函数（如 md5()、sha1()、md5_file()、crc32() 等）
+ * 将包含在构建中。
  */
-/* Symisc public definitions */
+/* Symisc 公共定义 */
 #if !defined(SYMISC_STANDARD_DEFS)
 #define SYMISC_STANDARD_DEFS
 #if defined (_WIN32) || defined (WIN32) || defined(__MINGW32__) || defined (_MSC_VER) || defined (_WIN32_WCE)
-/* Windows Systems */
+/* Windows 系统 */
 #if !defined(__WINNT__)
 #define __WINNT__
 #endif 
 /*
- * Determine if we are dealing with WindowsCE - which has a much
- * reduced API.
+ * 确定我们是否正在处理 WindowsCE——它有一个大幅精简的 API。
  */
 #if defined(_WIN32_WCE)
 #ifndef __WIN_CE__
@@ -178,8 +149,8 @@ typedef struct unqlite unqlite;
 #endif /* _WIN32_WCE */
 #else
 /*
- * By default we will assume that we are compiling on a UNIX systems.
- * Otherwise the OS_OTHER directive must be defined.
+ * 默认情况下，我们将假设我们正在 UNIX 系统上编译。
+ * 否则必须定义 OS_OTHER 指令。
  */
 #if !defined(OS_OTHER)
 #if !defined(__UNIXES__)
@@ -195,9 +166,9 @@ typedef unsigned __int64   sxu64; /* 64 bits(8 bytes) unsigned int64 */
 typedef signed long long int   sxi64; /* 64 bits(8 bytes) signed int64 */
 typedef unsigned long long int sxu64; /* 64 bits(8 bytes) unsigned int64 */
 #endif /* _MSC_VER */
-/* Signature of the consumer routine */
+/* 消费者例程的签名 */
 typedef int (*ProcConsumer)(const void *, unsigned int, void *);
-/* Forward reference */
+/* 前向引用 */
 typedef struct SyMutexMethods SyMutexMethods;
 typedef struct SyMemMethods SyMemMethods;
 typedef struct SyString SyString;
@@ -221,22 +192,22 @@ struct SyString
 	const char *zString;  /* Raw string (may not be null terminated) */
 	unsigned int nByte;   /* Raw string length */
 };
-/* Time structure. */
+/* 时间结构。*/
 struct Sytm
 {
-  int tm_sec;     /* seconds (0 - 60) */
-  int tm_min;     /* minutes (0 - 59) */
-  int tm_hour;    /* hours (0 - 23) */
-  int tm_mday;    /* day of month (1 - 31) */
-  int tm_mon;     /* month of year (0 - 11) */
-  int tm_year;    /* year + 1900 */
-  int tm_wday;    /* day of week (Sunday = 0) */
-  int tm_yday;    /* day of year (0 - 365) */
-  int tm_isdst;   /* is summer time in effect? */
-  char *tm_zone;  /* abbreviation of timezone name */
-  long tm_gmtoff; /* offset from UTC in seconds */
+  int tm_sec;     /* 秒 (0 - 60) */
+  int tm_min;     /* 分钟 (0 - 59) */
+  int tm_hour;    /* 小时 (0 - 23) */
+  int tm_mday;    /* 月中的某天 (1 - 31) */
+  int tm_mon;     /* 年中的月份 (0 - 11) */
+  int tm_year;    /* 年 + 1900 */
+  int tm_wday;    /* 星期几 (周日 = 0) */
+  int tm_yday;    /* 年中的某天 (0 - 365) */
+  int tm_isdst;   /* 是否夏令时生效？*/
+  char *tm_zone;  /* 时区名称缩写 */
+  long tm_gmtoff; /* 与 UTC 的偏移量（秒）*/
 };
-/* Convert a tm structure (struct tm *) found in <time.h> to a Sytm structure */
+/* 将 <time.h> 中的 tm 结构 (struct tm *) 转换为 Sytm 结构 */
 #define STRUCT_TM_TO_SYTM(pTM, pSYTM) \
 	(pSYTM)->tm_hour = (pTM)->tm_hour;\
 	(pSYTM)->tm_min	 = (pTM)->tm_min;\
@@ -264,29 +235,29 @@ struct Sytm
 	 (pSYTM)->tm_isdst = -1;\
 	 (pSYTM)->tm_zone = 0;
 
-/* Dynamic memory allocation methods. */
+/* 动态内存分配方法。*/
 struct SyMemMethods 
 {
-	void * (*xAlloc)(unsigned int);          /* [Required:] Allocate a memory chunk */
-	void * (*xRealloc)(void *, unsigned int); /* [Required:] Re-allocate a memory chunk */
-	void   (*xFree)(void *);                 /* [Required:] Release a memory chunk */
-	unsigned int  (*xChunkSize)(void *);     /* [Optional:] Return chunk size */
-	int    (*xInit)(void *);                 /* [Optional:] Initialization callback */
-	void   (*xRelease)(void *);              /* [Optional:] Release callback */
-	void  *pUserData;                        /* [Optional:] First argument to xInit() and xRelease() */
+	void * (*xAlloc)(unsigned int);          /* [必需:] 分配内存块 */
+	void * (*xRealloc)(void *, unsigned int); /* [必需:] 重新分配内存块 */
+	void   (*xFree)(void *);                 /* [必需:] 释放内存块 */
+	unsigned int  (*xChunkSize)(void *);     /* [可选:] 返回块大小 */
+	int    (*xInit)(void *);                 /* [可选:] 初始化回调 */
+	void   (*xRelease)(void *);              /* [可选:] 释放回调 */
+	void  *pUserData;                        /* [可选:] xInit() 和 xRelease() 的第一个参数 */
 };
-/* Out of memory callback signature. */
+/* 内存不足回调签名。*/
 typedef int (*ProcMemError)(void *);
-/* Mutex methods. */
+/* 互斥方法。*/
 struct SyMutexMethods 
 {
-	int (*xGlobalInit)(void);		/* [Optional:] Global mutex initialization */
-	void  (*xGlobalRelease)(void);	/* [Optional:] Global Release callback () */
-	SyMutex * (*xNew)(int);	        /* [Required:] Request a new mutex */
-	void  (*xRelease)(SyMutex *);	/* [Optional:] Release a mutex  */
-	void  (*xEnter)(SyMutex *);	    /* [Required:] Enter mutex */
-	int (*xTryEnter)(SyMutex *);    /* [Optional:] Try to enter a mutex */
-	void  (*xLeave)(SyMutex *);	    /* [Required:] Leave a locked mutex */
+	int (*xGlobalInit)(void);		/* [可选:] 全局互斥初始化 */
+	void  (*xGlobalRelease)(void);	/* [可选:] 全局释放回调 () */
+	SyMutex * (*xNew)(int);	        /* [必需:] 请求新的互斥 */
+	void  (*xRelease)(SyMutex *);	/* [可选:] 释放互斥  */
+	void  (*xEnter)(SyMutex *);	    /* [必需:] 进入互斥 */
+	int (*xTryEnter)(SyMutex *);    /* [可选:] 尝试进入互斥 */
+	void  (*xLeave)(SyMutex *);	    /* [必需:] 离开锁定的互斥 */
 };
 #if defined (_MSC_VER) || defined (__MINGW32__) ||  defined (__GNUC__) && defined (__declspec)
 #define SX_APIIMPORT	__declspec(dllimport)
@@ -346,9 +317,9 @@ typedef sxi64 uqlite_real;
 typedef double unqlite_real;
 #endif
 typedef sxi64 unqlite_int64;
-/* Standard UnQLite return values */
-#define UNQLITE_OK      SXRET_OK      /* Successful result */
-/* Beginning of error codes */
+/* 标准 UnQLite 返回值 */
+#define UNQLITE_OK      SXRET_OK      /* 成功结果 */
+/* 错误码开始 */
 #define UNQLITE_NOMEM    SXERR_MEM     /* Out of memory */
 #define UNQLITE_ABORT    SXERR_ABORT   /* Another thread have released this instance */
 #define UNQLITE_IOERR    SXERR_IO      /* IO error */
@@ -372,19 +343,16 @@ typedef sxi64 unqlite_int64;
 #define UNQLITE_CANTOPEN    (-74)       /* Unable to open the database file */
 #define UNQLITE_READ_ONLY   (-75)       /* Read only Key/Value storage engine */
 #define UNQLITE_LOCKERR     (-76)       /* Locking protocol error */
-/* end-of-error-codes */
+/* 错误码结束 */
 /*
- * Database Handle Configuration Commands.
+ * 数据库句柄配置命令。
  *
- * The following set of constants are the available configuration verbs that can
- * be used by the host-application to configure an UnQLite database handle.
- * These constants must be passed as the second argument to [unqlite_config()].
+ * 以下常量集是可用于主机应用程序配置 UnQLite 数据库句柄的配置动词。
+ * 这些常量必须作为第二个参数传递给 [unqlite_config()]。
  *
- * Each options require a variable number of arguments.
- * The [unqlite_config()] interface will return UNQLITE_OK on success, any other
- * return value indicates failure.
- * For a full discussion on the configuration verbs and their expected 
- * parameters, please refer to this page:
+ * 每个选项需要可变数量的参数。
+ * [unqlite_config()] 接口成功时返回 UNQLITE_OK，任何其他返回值表示失败。
+ * 有关配置动词及其预期参数的完整讨论，请参阅此页面：
  *      http://unqlite.org/c_api/unqlite_config.html
  */
 #define UNQLITE_CONFIG_JX9_ERR_LOG         1  /* TWO ARGUMENTS: const char **pzBuf, int *pLen */
@@ -394,20 +362,16 @@ typedef sxi64 unqlite_int64;
 #define UNQLITE_CONFIG_DISABLE_AUTO_COMMIT 5  /* NO ARGUMENTS */
 #define UNQLITE_CONFIG_GET_KV_NAME         6  /* ONE ARGUMENT: const char **pzPtr */
 /*
- * UnQLite/Jx9 Virtual Machine Configuration Commands.
+ * UnQLite/Jx9 虚拟机配置命令。
  *
- * The following set of constants are the available configuration verbs that can
- * be used by the host-application to configure the Jx9 (Via UnQLite) Virtual machine.
- * These constants must be passed as the second argument to the [unqlite_vm_config()] 
- * interface.
- * Each options require a variable number of arguments.
- * The [unqlite_vm_config()] interface will return UNQLITE_OK on success, any other return
- * value indicates failure.
- * There are many options but the most important are: UNQLITE_VM_CONFIG_OUTPUT which install
- * a VM output consumer callback, UNQLITE_VM_CONFIG_HTTP_REQUEST which parse and register
- * a HTTP request and UNQLITE_VM_CONFIG_ARGV_ENTRY which populate the $argv array.
- * For a full discussion on the configuration verbs and their expected parameters, please
- * refer to this page:
+ * 以下常量集是可用于主机应用程序配置 Jx9（通过 UnQLite）虚拟机的配置动词。
+ * 这些常量必须作为第二个参数传递给 [unqlite_vm_config()] 接口。
+ * 每个选项需要可变数量的参数。
+ * [unqlite_vm_config()] 接口成功时返回 UNQLITE_OK，任何其他返回值表示失败。
+ * 有很多选项，但最重要的是：UNQLITE_VM_CONFIG_OUTPUT 用于安装 VM 输出消费者回调，
+ * UNQLITE_VM_CONFIG_HTTP_REQUEST 用于解析和注册 HTTP 请求，
+ * UNQLITE_VM_CONFIG_ARGV_ENTRY 用于填充 $argv 数组。
+ * 有关配置动词及其预期参数的完整讨论，请参阅此页面：
  *      http://unqlite.org/c_api/unqlite_vm_config.html
  */
 #define UNQLITE_VM_CONFIG_OUTPUT           1  /* TWO ARGUMENTS: int (*xConsumer)(const void *pOut, unsigned int nLen, void *pUserData), void *pUserData */
@@ -424,16 +388,13 @@ typedef sxi64 unqlite_int64;
 #define UNQLITE_VM_CONFIG_ARGV_ENTRY      12  /* ONE ARGUMENT: const char *zValue */
 #define UNQLITE_VM_CONFIG_EXTRACT_OUTPUT  13  /* TWO ARGUMENTS: const void **ppOut, unsigned int *pOutputLen */
 /*
- * Storage engine configuration commands.
+ * 存储引擎配置命令。
  *
- * The following set of constants are the available configuration verbs that can
- * be used by the host-application to configure the underlying storage engine (i.e Hash, B+tree, R+tree).
- * These constants must be passed as the first argument to [unqlite_kv_config()].
- * Each options require a variable number of arguments.
- * The [unqlite_kv_config()] interface will return UNQLITE_OK on success, any other return
- * value indicates failure.
- * For a full discussion on the configuration verbs and their expected parameters, please
- * refer to this page:
+ * 以下常量集是可用于主机应用程序配置底层存储引擎（即 Hash、B+tree、R+tree）的配置动词。
+ * 这些常量必须作为第一个参数传递给 [unqlite_kv_config()]。
+ * 每个选项需要可变数量的参数。
+ * [unqlite_kv_config()] 接口成功时返回 UNQLITE_OK，任何其他返回值表示失败。
+ * 有关配置动词及其预期参数的完整讨论，请参阅此页面：
  *      http://unqlite.org/c_api/unqlite_kv_config.html
  */
 #define UNQLITE_KV_CONFIG_HASH_FUNC  1 /* ONE ARGUMENT: unsigned int (*xHash)(const void *,unsigned int) */
@@ -499,11 +460,10 @@ typedef sxi64 unqlite_int64;
 #define UNQLITE_SYNC_FULL          0x00003
 #define UNQLITE_SYNC_DATAONLY      0x00010
 /*
- * File Locking Levels
+ * 文件锁定级别
  *
- * UnQLite uses one of these integer values as the second
- * argument to calls it makes to the xLock() and xUnlock() methods
- * of an [unqlite_io_methods] object.
+ * UnQLite 使用这些整数值之一作为对 [unqlite_io_methods] 对象的
+ * xLock() 和 xUnlock() 方法调用的第二个参数。
  */
 #define UNQLITE_LOCK_NONE          0
 #define UNQLITE_LOCK_SHARED        1
@@ -511,41 +471,35 @@ typedef sxi64 unqlite_int64;
 #define UNQLITE_LOCK_PENDING       3
 #define UNQLITE_LOCK_EXCLUSIVE     4
 /*
- * CAPIREF: OS Interface: Open File Handle
+ * CAPIREF: OS 接口：打开文件句柄
  *
- * An [unqlite_file] object represents an open file in the [unqlite_vfs] OS interface
- * layer.
- * Individual OS interface implementations will want to subclass this object by appending
- * additional fields for their own use. The pMethods entry is a pointer to an
- * [unqlite_io_methods] object that defines methods for performing
- * I/O operations on the open file.
+ * [unqlite_file] 对象表示 [unqlite_vfs] OS 接口层中打开的文件。
+ * 单独的 OS 接口实现可能希望将此对象子类化，追加自己的字段。
+ * pMethods 条目是指向 [unqlite_io_methods] 对象的指针，该对象定义了对
+ * [unqlite_file] 对象表示的打开文件执行各种 I/O 操作的方法。
 */
 typedef struct unqlite_file unqlite_file;
 struct unqlite_file {
-  const unqlite_io_methods *pMethods;  /* Methods for an open file. MUST BE FIRST */
+  const unqlite_io_methods *pMethods;  /* 打开文件的方法。必须是第一个 */
 };
 /*
- * CAPIREF: OS Interface: File Methods Object
+ * CAPIREF: OS 接口：文件方法对象
  *
- * Every file opened by the [unqlite_vfs] xOpen method populates an
- * [unqlite_file] object (or, more commonly, a subclass of the
- * [unqlite_file] object) with a pointer to an instance of this object.
- * This object defines the methods used to perform various operations
- * against the open file represented by the [unqlite_file] object.
+ * [unqlite_vfs] xOpen 方法打开的每个文件都会用指向此对象实例的指针填充
+ * [unqlite_file] 对象（或更常见的 [unqlite_file] 对象的子类）。
+ * 此对象定义了对 [unqlite_file] 对象表示的打开文件执行各种操作的方法。
  *
- * If the xOpen method sets the unqlite_file.pMethods element 
- * to a non-NULL pointer, then the unqlite_io_methods.xClose method
- * may be invoked even if the xOpen reported that it failed.  The
- * only way to prevent a call to xClose following a failed xOpen
- * is for the xOpen to set the unqlite_file.pMethods element to NULL.
+ * 如果 xOpen 方法将 unqlite_file.pMethods 元素设置为非 NULL 指针，
+ * 则即使 xOpen 报告失败，也可能调用 unqlite_io_methods.xClose 方法。
+ * 防止在 xOpen 失败后调用 xClose 的唯一方法是让 xOpen 将
+ * unqlite_file.pMethods 元素设置为 NULL。
  *
- * The flags argument to xSync may be one of [UNQLITE_SYNC_NORMAL] or
- * [UNQLITE_SYNC_FULL]. The first choice is the normal fsync().
- * The second choice is a Mac OS X style fullsync. The [UNQLITE_SYNC_DATAONLY]
- * flag may be ORed in to indicate that only the data of the file
- * and not its inode needs to be synced.
+ * xSync 的 flags 参数可以是 [UNQLITE_SYNC_NORMAL] 或 [UNQLITE_SYNC_FULL] 之一。
+ * 第一种选择是正常的 fsync()。第二种选择是 Mac OS X 风格的 fullsync。
+ * [UNQLITE_SYNC_DATAONLY] 标志可以通过 OR 运算添加，以表示只需要同步文件的数据，
+ * 而不需要同步其 inode。
  *
- * The integer values to xLock() and xUnlock() are one of
+ * xLock() 和 xUnlock() 的整数值是以下之一
  *
  * UNQLITE_LOCK_NONE
  * UNQLITE_LOCK_SHARED

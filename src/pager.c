@@ -1,14 +1,13 @@
 /*
- * Symisc unQLite: An Embeddable NoSQL (Post Modern) Database Engine.
- * Copyright (C) 2012-2013, Symisc Systems http://unqlite.org/
- * Copyright (C) 2014, Yuras Shumovich <shumovichy@gmail.com>
- * Version 1.1.6
- * For information on licensing, redistribution of this file, and for a DISCLAIMER OF ALL WARRANTIES
- * please contact Symisc Systems via:
+ * Symisc unQLite: 一个嵌入式 NoSQL（后现代）数据库引擎。
+ * 版权所有 (C) 2012-2013, Symisc Systems http://unqlite.org/
+ * 版权所有 (C) 2014, Yuras Shumovich <shumovichy@gmail.com>
+ * 版本 1.1.6
+ * 有关许可协议、再分发和免责声明的详细信息，请联系 Symisc Systems：
  *       legal@symisc.net
  *       licensing@symisc.net
  *       contact@symisc.net
- * or visit:
+ * 或访问：
  *      http://unqlite.org/licensing.html
  */
  /* $SymiscID: pager.c v1.1 Win7 2012-11-29 03:46 stable <chm@symisc.net> $ */
@@ -16,11 +15,10 @@
 #include "unqliteInt.h"
 #endif
 /*
-** This file implements the pager and the transaction manager for UnQLite (Mostly inspired from the SQLite3 Source tree).
+** 此文件为 UnQLite 实现了 pager 和事务管理器（主要灵感来自 SQLite3 源码树）。
 **
-** The Pager.eState variable stores the current 'state' of a pager. A
-** pager may be in any one of the seven states shown in the following
-** state diagram.
+** Pager.eState 变量存储 pager 的当前'状态'。pager 可能处于以下
+** 状态图中显示的七个状态之一。
 **
 **                            OPEN <------+------+
 **                              |         |      |
@@ -41,42 +39,36 @@
 ** 
 **  OPEN:
 **
-**    The pager starts up in this state. Nothing is guaranteed in this
-**    state - the file may or may not be locked and the database size is
-**    unknown. The database may not be read or written.
+**    pager 在此状态下启动。此状态下不保证任何事情 -
+**    文件可能锁定也可能未锁定，数据库大小未知。
+**    不能读取或写入数据库。
 **
-**    * No read or write transaction is active.
-**    * Any lock, or no lock at all, may be held on the database file.
-**    * The dbSize and dbOrigSize variables may not be trusted.
+**    * 没有活动中的读或写事务。
+**    * 可以在数据库文件上持有任何锁或完全不持有锁。
+**    * dbSize 和 dbOrigSize 变量可能不可信。
 **
 **  READER:
 **
-**    In this state all the requirements for reading the database in 
-**    rollback mode are met. Unless the pager is (or recently
-**    was) in exclusive-locking mode, a user-level read transaction is 
-**    open. The database size is known in this state.
+**    在此状态下，满足以回滚模式读取数据库的所有要求。
+**    除非 pager（或最近）处于独占锁定模式，否则用户级读事务是开放的。
+**    此状态下数据库大小是已知的。
 ** 
-**    * A read transaction may be active (but a write-transaction cannot).
-**    * A SHARED or greater lock is held on the database file.
-**    * The dbSize variable may be trusted (even if a user-level read 
-**      transaction is not active). The dbOrigSize variables
-**      may not be trusted at this point.
-**    * Even if a read-transaction is not open, it is guaranteed that 
-**      there is no hot-journal in the file-system.
+**    * 读事务可能是活动的（但写事务不能）。
+**    * 在数据库文件上持有 SHARED 或更强的锁。
+**    * dbSize 变量可能是可信的（即使用户级读事务不活动）。
+**      dbOrigSize 变量此时可能不可信。
+**    * 即使读事务未打开，也能保证文件系统中没有热日志。
 **
 **  WRITER_LOCKED:
 **
-**    The pager moves to this state from READER when a write-transaction
-**    is first opened on the database. In WRITER_LOCKED state, all locks 
-**    required to start a write-transaction are held, but no actual 
-**    modifications to the cache or database have taken place.
+**    当在数据库上首次打开写事务时，pager 从 READER 进入此状态。
+**    在 WRITER_LOCKED 状态下，启动写事务所需的所有锁都被持有，
+**    但对缓存或数据库没有进行实际修改。
 **
-**    In rollback mode, a RESERVED or (if the transaction was opened with 
-**    EXCLUSIVE flag) EXCLUSIVE lock is obtained on the database file when
-**    moving to this state, but the journal file is not written to or opened 
-**    to in this state. If the transaction is committed or rolled back while 
-**    in WRITER_LOCKED state, all that is required is to unlock the database 
-**    file.
+**    在回滚模式下，当进入此状态时，在数据库文件上获取 RESERVED
+**    或（如果事务使用 EXCLUSIVE 标志打开）EXCLUSIVE 锁，
+**    但日志文件在此状态下不会被写入或打开。如果事务在 WRITER_LOCKED
+**    状态下提交或回滚，只需要做的就是解锁数据库文件。
 **
 **    * A write transaction is active.
 **    * If the connection is open in rollback-mode, a RESERVED or greater 

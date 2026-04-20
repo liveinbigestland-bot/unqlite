@@ -1,14 +1,13 @@
 /*
- * Symisc unQLite: An Embeddable NoSQL (Post Modern) Database Engine.
- * Copyright (C) 2012-2018, Symisc Systems http://unqlite.org/
- * Copyright (C) 2014, Yuras Shumovich <shumovichy@gmail.com>
- * Version 1.1.6
- * For information on licensing, redistribution of this file, and for a DISCLAIMER OF ALL WARRANTIES
- * please contact Symisc Systems via:
+ * Symisc unQLite: 一个嵌入式 NoSQL（后现代）数据库引擎。
+ * 版权所有 (C) 2012-2018, Symisc Systems http://unqlite.org/
+ * 版权所有 (C) 2014, Yuras Shumovich <shumovichy@gmail.com>
+ * 版本 1.1.6
+ * 有关许可协议、再分发和免责声明的详细信息，请联系 Symisc Systems：
  *       legal@symisc.net
  *       licensing@symisc.net
  *       contact@symisc.net
- * or visit:
+ * 或访问：
  *      http://unqlite.org/licensing.html
  */
  /* $SymiscID: lhash_kv.c v1.7 Solaris 2013-01-14 12:56 stable <chm@symisc.net> $ */
@@ -16,67 +15,64 @@
 #include "unqliteInt.h"
 #endif
 /* 
- * This file implements disk based hashtable using the linear hashing algorithm.
- * This implementation is the one decribed in the paper:
+ * 此文件使用线性哈希算法实现基于磁盘的哈希表。
+ * 此实现是论文中描述的实现：
  *  LINEAR HASHING : A NEW TOOL FOR FILE AND TABLE ADDRESSING. Witold Litwin. I. N. Ft. I. A.. 78 150 Le Chesnay, France.
- * Plus a smart extension called Virtual Bucket Table. (contact devel@symisc.net for additional information).
+ * 加上一个名为 Virtual Bucket Table 的智能扩展。（请联系 devel@symisc.net 获取更多信息）。
  */
-/* Magic number identifying a valid storage image */
+/* 识别有效存储图像的幻数 */
 #define L_HASH_MAGIC 0xFA782DCB
 /*
- * Magic word to hash to identify a valid hash function.
+ * 用于哈希以识别有效哈希函数的幻数。
  */
 #define L_HASH_WORD "chm@symisc"
 /*
- * Cell size on disk. 
+ * 磁盘上的单元格大小。 
  */
-#define L_HASH_CELL_SZ (4/*Hash*/+4/*Key*/+8/*Data*/+2/* Offset of the next cell */+8/*Overflow*/)
+#define L_HASH_CELL_SZ (4/*Hash*/+4/*Key*/+8/*Data*/+2/* 下一个单元格的偏移 */+8/*Overflow*/)
 /*
- * Primary page (not overflow pages) header size on disk.
+ * 主页面（非溢出页面）在磁盘上的头部大小。
  */
-#define L_HASH_PAGE_HDR_SZ (2/* Cell offset*/+2/* Free block offset*/+8/*Slave page number*/)
+#define L_HASH_PAGE_HDR_SZ (2/* 单元格偏移*/+2/* 空闲块偏移*/+8/* 从页面编号*/)
 /*
- * The maximum amount of payload (in bytes) that can be stored locally for
- * a database entry.  If the entry contains more data than this, the
- * extra goes onto overflow pages.
+ * 可以本地存储在数据库条目中的最大有效载荷（以字节为单位）。
+ * 如果条目包含的数据超过此值，则多余部分将进入溢出页面。
 */
 #define L_HASH_MX_PAYLOAD(PageSize)  (PageSize-(L_HASH_PAGE_HDR_SZ+L_HASH_CELL_SZ))
 /*
- * Maxium free space on a single page.
+ * 单个页面上的最大空闲空间。
  */
 #define L_HASH_MX_FREE_SPACE(PageSize) (PageSize - (L_HASH_PAGE_HDR_SZ))
 /*
-** The maximum number of bytes of payload allowed on a single overflow page.
+** 单个溢出页面上允许的最大有效载荷字节数。
 */
 #define L_HASH_OVERFLOW_SIZE(PageSize) (PageSize-8)
-/* Forward declaration */
+/* 前向声明 */
 typedef struct lhash_kv_engine lhash_kv_engine;
 typedef struct lhpage lhpage;
 /*
- * Each record in the database is identified either in-memory or in
- * disk by an instance of the following structure.
+ * 数据库中的每条记录都由以下结构的实例在内存中或磁盘上标识。
  */
 typedef struct lhcell lhcell;
 struct lhcell
 {
-	/* Disk-data (Big-Endian) */
-	sxu32 nHash;   /* Hash of the key: 4 bytes */
-	sxu32 nKey;    /* Key length: 4 bytes */
-	sxu64 nData;   /* Data length: 8 bytes */
-	sxu16 iNext;   /* Offset of the next cell: 2 bytes */
-	pgno iOvfl;    /* Overflow page number if any: 8 bytes */
-	/* In-memory data only */
-	lhpage *pPage;     /* Page this cell belongs */
-	sxu16 iStart;      /* Offset of this cell */
-	pgno iDataPage;    /* Data page number when overflow */
-	sxu16 iDataOfft;   /* Offset of the data in iDataPage */
-	SyBlob sKey;       /* Record key for fast lookup (Kept in-memory if < 256KB ) */
-	lhcell *pNext,*pPrev;         /* Linked list of the loaded memory cells */
-	lhcell *pNextCol,*pPrevCol;   /* Collison chain  */
+	/* 磁盘数据（大端序）*/
+	sxu32 nHash;   /* 键的哈希：4 字节 */
+	sxu32 nKey;    /* 键长度：4 字节 */
+	sxu64 nData;   /* 数据长度：8 字节 */
+	sxu16 iNext;   /* 下一个单元格的偏移：2 字节 */
+	pgno iOvfl;    /* 溢出页面编号（如果有）：8 字节 */
+	/* 仅在内存中的数据 */
+	lhpage *pPage;     /* 此单元格所属的页面 */
+	sxu16 iStart;      /* 此单元格的偏移 */
+	pgno iDataPage;    /* 溢出时的数据页面编号 */
+	sxu16 iDataOfft;   /* iDataPage 中数据的偏移 */
+	SyBlob sKey;       /* 用于快速查找的记录键（如果 < 256KB 则保留在内存中）*/
+	lhcell *pNext,*pPrev;         /* 已加载内存单元格的链表 */
+	lhcell *pNextCol,*pPrevCol;   /* 冲突链  */
 };
 /*
-** Each database page has a header that is an instance of this
-** structure.
+** 每个数据库页面都有一个作为此结构实例的头部。
 */
 typedef struct lhphdr lhphdr;
 struct lhphdr 

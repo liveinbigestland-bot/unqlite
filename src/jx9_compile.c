@@ -1,13 +1,12 @@
 /*
- * Symisc JX9: A Highly Efficient Embeddable Scripting Engine Based on JSON.
- * Copyright (C) 2012-2013, Symisc Systems http://jx9.symisc.net/
- * Version 1.7.2
- * For information on licensing, redistribution of this file, and for a DISCLAIMER OF ALL WARRANTIES
- * please contact Symisc Systems via:
+ * Symisc JX9: 一个基于 JSON 的高效嵌入式脚本引擎。
+ * 版权所有 (C) 2012-2013, Symisc Systems http://jx9.symisc.net/
+ * 版本 1.7.2
+ * 有关许可协议、再分发和免责声明的详细信息，请联系 Symisc Systems：
  *       legal@symisc.net
  *       licensing@symisc.net
  *       contact@symisc.net
- * or visit:
+ * 或访问：
  *      http://jx9.symisc.net/
  */
  /* $SymiscID: compile.c v1.7 FreeBSD 2012-12-11 21:46 stable <chm@symisc.net> $ */
@@ -15,47 +14,43 @@
 #include "jx9Int.h"
 #endif
 /*
- * This file implement a thread-safe and full-reentrant compiler for the JX9 engine.
- * That is, routines defined in this file takes a stream of tokens and output
- * JX9 bytecode instructions.
+ * 此文件为 JX9 引擎实现了一个线程安全且完全可重入的编译器。
+ * 也就是说，此文件中定义的例程接收令牌流并输出 JX9 字节码指令。
  */
-/* Forward declaration */
+/* 前向声明 */
 typedef struct LangConstruct LangConstruct;
 typedef struct JumpFixup     JumpFixup;
-/* Block [i.e: set of statements] control flags */
-#define GEN_BLOCK_LOOP        0x001    /* Loop block [i.e: for, while, ...] */
-#define GEN_BLOCK_PROTECTED   0x002    /* Protected block */
-#define GEN_BLOCK_COND        0x004    /* Conditional block [i.e: if(condition){} ]*/
-#define GEN_BLOCK_FUNC        0x008    /* Function body */
-#define GEN_BLOCK_GLOBAL      0x010    /* Global block (always set)*/
-#define GEN_BLOC_NESTED_FUNC  0x020    /* Nested function body */
-#define GEN_BLOCK_EXPR        0x040    /* Expression */
-#define GEN_BLOCK_STD         0x080    /* Standard block */
-#define GEN_BLOCK_SWITCH      0x100    /* Switch statement */
+/* 块[即语句集]控制标志 */
+#define GEN_BLOCK_LOOP        0x001    /* 循环块 [即 for, while, ...] */
+#define GEN_BLOCK_PROTECTED   0x002    /* 受保护的块 */
+#define GEN_BLOCK_COND        0x004    /* 条件块 [即 if(condition){} ]*/
+#define GEN_BLOCK_FUNC        0x008    /* 函数体 */
+#define GEN_BLOCK_GLOBAL      0x010    /* 全局块（始终设置）*/
+#define GEN_BLOC_NESTED_FUNC  0x020    /* 嵌套函数体 */
+#define GEN_BLOCK_EXPR        0x040    /* 表达式 */
+#define GEN_BLOCK_STD         0x080    /* 标准块 */
+#define GEN_BLOCK_SWITCH      0x100    /* Switch 语句 */
 /*
- * Compilation of some JX9 constructs such as if, for, while, the logical or
- * (||) and logical and (&&) operators in expressions requires the
- * generation of forward jumps.
- * Since the destination PC target of these jumps isn't known when the jumps
- * are emitted, we record each forward jump in an instance of the following
- * structure. Those jumps are fixed later when the jump destination is resolved.
+ * 某些 JX9 结构（如 if、for、while、逻辑或（||）和逻辑与（&&）运算符）
+ * 的编译需要生成向前跳转。
+ * 由于在跳转发出时不知道这些跳转的目标 PC，因此我们将每个向前跳转记录在
+ * 以下结构的实例中。这些跳转稍后在跳转目标解析时修复。
  */
 struct JumpFixup
 {
-	sxi32 nJumpType;     /* Jump type. Either TRUE jump, FALSE jump or Unconditional jump */
-	sxu32 nInstrIdx;     /* Instruction index to fix later when the jump destination is resolved. */
+	sxi32 nJumpType;     /* 跳转类型。可以是 TRUE 跳转、FALSE 跳转或无条件跳转 */
+	sxu32 nInstrIdx;     /* 指令索引，稍后在解析跳转目标时修复。*/
 };
 /*
- * Each language construct is represented by an instance
- * of the following structure.
+ * 每个语言结构都由以下结构的实例表示。
  */
 struct LangConstruct
 {
-	sxu32 nID;                     /* Language construct ID [i.e: JX9_TKWRD_WHILE, JX9_TKWRD_FOR, JX9_TKWRD_IF...] */
-	ProcLangConstruct xConstruct;  /* C function implementing the language construct */
+	sxu32 nID;                     /* 语言结构 ID [即 JX9_TKWRD_WHILE, JX9_TKWRD_FOR, JX9_TKWRD_IF...] */
+	ProcLangConstruct xConstruct;  /* 实现语言结构的 C 函数 */
 };
-/* Compilation flags */
-#define JX9_COMPILE_SINGLE_STMT 0x001 /* Compile a single statement */
+/* 编译标志 */
+#define JX9_COMPILE_SINGLE_STMT 0x001 /* 编译单个语句 */
 /* Token stream synchronization macros */
 #define SWAP_TOKEN_STREAM(GEN, START, END)\
 	pTmp  = GEN->pEnd;\

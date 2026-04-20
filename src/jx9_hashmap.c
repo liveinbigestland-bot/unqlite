@@ -1,32 +1,31 @@
 /*
- * Symisc JX9: A Highly Efficient Embeddable Scripting Engine Based on JSON.
- * Copyright (C) 2012-2013, Symisc Systems http://jx9.symisc.net/
- * Version 1.7.2
- * For information on licensing, redistribution of this file, and for a DISCLAIMER OF ALL WARRANTIES
- * please contact Symisc Systems via:
+ * Symisc JX9: 一个基于 JSON 的高效嵌入式脚本引擎。
+ * 版权所有 (C) 2012-2013, Symisc Systems http://jx9.symisc.net/
+ * 版本 1.7.2
+ * 有关许可协议、再分发和免责声明的详细信息，请联系 Symisc Systems：
  *       legal@symisc.net
  *       licensing@symisc.net
  *       contact@symisc.net
- * or visit:
+ * 或访问：
  *      http://jx9.symisc.net/
  */
- /* $SymiscID: hashmap.c v2.6 Win7 2012-12-11 00:50 stable <chm@symisc.net> $ */
+/* $SymiscID: hashmap.c v2.6 Win7 2012-12-11 00:50 stable <chm@symisc.net> $ */
 #ifndef JX9_AMALGAMATION
 #include "jx9Int.h"
 #endif
-/* This file implement generic hashmaps used to represent JSON arrays and objects */
-/* Allowed node types */
-#define HASHMAP_INT_NODE   1  /* Node with an int [i.e: 64-bit integer] key */
-#define HASHMAP_BLOB_NODE  2  /* Node with a string/BLOB key */
+/* 本文件实现了用于表示 JSON 数组和对象的通用哈希表 */
+/* 允许的节点类型 */
+#define HASHMAP_INT_NODE   1  /* 带整型 [即: 64位整数] 键的节点 */
+#define HASHMAP_BLOB_NODE  2  /* 带字符串/BLOB 键的节点 */
 /*
- * Default hash function for int [i.e; 64-bit integer] keys.
+ * 整型键 [即: 64位整数] 的默认哈希函数。
  */
 static sxu32 IntHash(sxi64 iKey)
 {
 	return (sxu32)(iKey ^ (iKey << 8) ^ (iKey >> 8));
 }
 /*
- * Default hash function for string/BLOB keys.
+ * 字符串/BLOB 键的默认哈希函数。
  */
 static sxu32 BinHash(const void *pSrc, sxu32 nLen)
 {
@@ -43,9 +42,9 @@ static sxu32 BinHash(const void *pSrc, sxu32 nLen)
 	return nH;
 }
 /*
- * Return the total number of entries in a given hashmap.
- * If bRecurisve is set to TRUE then recurse on hashmap entries.
- * If the nesting limit is reached, this function abort immediately. 
+ * 返回给定哈希表中的条目总数。
+ * 如果 bRecursive 设置为 TRUE，则递归遍历哈希表条目。
+ * 如果达到嵌套限制，此函数将立即中止。
  */
 static sxi64 HashmapCount(jx9_hashmap *pMap, int bRecursive, int iRecCount)
 {
@@ -53,7 +52,7 @@ static sxi64 HashmapCount(jx9_hashmap *pMap, int bRecursive, int iRecCount)
 	if( !bRecursive ){
 		iCount = pMap->nEntry;
 	}else{
-		/* Recursive hashmap walk */
+		/* 递归遍历哈希表 */
 		jx9_hashmap_node *pEntry = pMap->pLast;
 		jx9_value *pElem;
 		sxu32 n = 0;
@@ -61,15 +60,15 @@ static sxi64 HashmapCount(jx9_hashmap *pMap, int bRecursive, int iRecCount)
 			if( n >= pMap->nEntry ){
 				break;
 			}
-			/* Point to the element value */
+			/* 指向元素值 */
 			pElem = (jx9_value *)SySetAt(&pMap->pVm->aMemObj, pEntry->nValIdx);
 			if( pElem ){
 				if( pElem->iFlags & MEMOBJ_HASHMAP ){
 					if( iRecCount > 31 ){
-						/* Nesting limit reached */
+						/* 达到嵌套限制 */
 						return iCount;
 					}
-					/* Recurse */
+					/* 递归 */
 					iRecCount++;
 					iCount += HashmapCount((jx9_hashmap *)pElem->x.pOther, TRUE, iRecCount);
 					iRecCount--;
@@ -79,15 +78,15 @@ static sxi64 HashmapCount(jx9_hashmap *pMap, int bRecursive, int iRecCount)
 			pEntry = pEntry->pNext;
 			++n;
 		}
-		/* Update count */
+		/* 更新计数 */
 		iCount += pMap->nEntry;
 	}
 	return iCount;
 }
 /*
- * Allocate a new hashmap node with a 64-bit integer key.
- * If something goes wrong [i.e: out of memory], this function return NULL.
- * Otherwise a fresh [jx9_hashmap_node] instance is returned.
+ * 分配一个带有64位整数键的新哈希表节点。
+ * 如果出现问题 [即: 内存不足]，此函数返回 NULL。
+ * 否则返回一个新的 [jx9_hashmap_node] 实例。
  */
 static jx9_hashmap_node * HashmapNewIntNode(jx9_hashmap *pMap, sxi64 iKey, sxu32 nHash, sxu32 nValIdx)
 {
@@ -108,9 +107,9 @@ static jx9_hashmap_node * HashmapNewIntNode(jx9_hashmap *pMap, sxi64 iKey, sxu32
 	return pNode;
 }
 /*
- * Allocate a new hashmap node with a BLOB key.
- * If something goes wrong [i.e: out of memory], this function return NULL.
- * Otherwise a fresh [jx9_hashmap_node] instance is returned.
+ * 分配一个带有 BLOB 键的新哈希表节点。
+ * 如果出现问题 [即: 内存不足]，此函数返回 NULL。
+ * 否则返回一个新的 [jx9_hashmap_node] 实例。
  */
 static jx9_hashmap_node * HashmapNewBlobNode(jx9_hashmap *pMap, const void *pKey, sxu32 nKeyLen, sxu32 nHash, sxu32 nValIdx)
 {
@@ -132,17 +131,17 @@ static jx9_hashmap_node * HashmapNewBlobNode(jx9_hashmap *pMap, const void *pKey
 	return pNode;
 }
 /*
- * link a hashmap node to the given bucket index (last argument to this function).
+ * 将哈希表节点链接到给定的桶索引（此函数的最后一个参数）。
  */
 static void HashmapNodeLink(jx9_hashmap *pMap, jx9_hashmap_node *pNode, sxu32 nBucketIdx)
 {
-	/* Link */
+	/* 链接 */
 	if( pMap->apBucket[nBucketIdx] != 0 ){
 		pNode->pNextCollide = pMap->apBucket[nBucketIdx];
 		pMap->apBucket[nBucketIdx]->pPrevCollide = pNode;
 	}
 	pMap->apBucket[nBucketIdx] = pNode;
-	/* Link to the map list */
+	/* 链接到映射列表 */
 	if( pMap->pFirst == 0 ){
 		pMap->pFirst = pMap->pLast = pNode;
 		/* Point to the first inserted node */
@@ -1535,28 +1534,28 @@ static void HashmapSortRehash(jx9_hashmap *pMap)
 	}
 }
 /*
- * Array functions implementation.
- * Authors:
+ * 数组函数实现。
+ * 作者:
  *  Symisc Systems, devel@symisc.net.
- *  Copyright (C) Symisc Systems, http://jx9.symisc.net
- * Status:
- *  Stable.
+ *  版权所有 (C) Symisc Systems, http://jx9.symisc.net
+ * 状态:
+ *  稳定版。
  */
 /*
  * bool sort(array &$array[, int $sort_flags = SORT_REGULAR ] )
- * Sort an array.
- * Parameters
+ * 对数组进行排序。
+ * 参数
  *  $array
- *   The input array.
+ *   输入数组。
  * $sort_flags
- *  The optional second parameter sort_flags may be used to modify the sorting behavior using these values:
- *  Sorting type flags:
- *   SORT_REGULAR - compare items normally (don't change types)
- *   SORT_NUMERIC - compare items numerically
- *   SORT_STRING - compare items as strings
- * Return
- *  TRUE on success or FALSE on failure.
- * 
+ *  可选的第二个参数 sort_flags 可用于修改排序行为，使用以下值：
+ *  排序类型标志:
+ *   SORT_REGULAR - 正常比较项目（不改变类型）
+ *   SORT_NUMERIC - 按数值比较项目
+ *   SORT_STRING - 按字符串比较项目
+ * 返回
+ *  成功返回 TRUE，失败返回 FALSE。
+ *
  */
 static int jx9_hashmap_sort(jx9_context *pCtx, int nArg, jx9_value **apArg)
 {

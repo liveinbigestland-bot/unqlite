@@ -1,25 +1,22 @@
 /*
- * Symisc unQLite: An Embeddable NoSQL (Post Modern) Database Engine.
- * Copyright (C) 2012-2013, Symisc Systems http://unqlite.org/
- * Version 1.1.6
- * For information on licensing, redistribution of this file, and for a DISCLAIMER OF ALL WARRANTIES
- * please contact Symisc Systems via:
+ * Symisc unQLite: 一个嵌入式 NoSQL（后现代）数据库引擎。
+ * 版权所有 (C) 2012-2013, Symisc Systems http://unqlite.org/
+ * 版本 1.1.6
+ * 有关许可协议、再分发和免责声明的详细信息，请联系 Symisc Systems：
  *       legal@symisc.net
  *       licensing@symisc.net
  *       contact@symisc.net
- * or visit:
+ * 或访问：
  *      http://unqlite.org/licensing.html
  */
  /* $SymiscID: os.c v1.0 FreeBSD 2012-11-12 21:27 devel <chm@symisc.net> $ */
 #ifndef UNQLITE_AMALGAMATION
 #include "unqliteInt.h"
 #endif
-/* OS interfaces abstraction layers: Mostly SQLite3 source tree */
+/* OS 接口抽象层：主要来自 SQLite3 源码树 */
 /*
-** The following routines are convenience wrappers around methods
-** of the unqlite_file object.  This is mostly just syntactic sugar. All
-** of this would be completely automatic if UnQLite were coded using
-** C++ instead of plain old C.
+** 以下例程是 unqlite_file 对象方法的便捷包装器。这主要只是语法糖。
+** 如果 UnQLite 使用 C++ 而不是普通的 C 编写，所有这些都将是完全自动的。
 */
 UNQLITE_PRIVATE int unqliteOsRead(unqlite_file *id, void *pBuf, unqlite_int64 amt, unqlite_int64 offset)
 {

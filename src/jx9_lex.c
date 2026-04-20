@@ -1,27 +1,26 @@
 /*
- * Symisc JX9: A Highly Efficient Embeddable Scripting Engine Based on JSON.
- * Copyright (C) 2012-2013, Symisc Systems http://jx9.symisc.net/
- * Version 1.7.2
- * For information on licensing, redistribution of this file, and for a DISCLAIMER OF ALL WARRANTIES
- * please contact Symisc Systems via:
+ * Symisc JX9: 一个基于 JSON 的高效嵌入式脚本引擎。
+ * 版权所有 (C) 2012-2013, Symisc Systems http://jx9.symisc.net/
+ * 版本 1.7.2
+ * 有关许可信息、redistrib免责声明，请通过以下方式联系 Symisc Systems：
  *       legal@symisc.net
  *       licensing@symisc.net
  *       contact@symisc.net
- * or visit:
+ * 或访问：
  *      http://jx9.symisc.net/
  */
- /* $SymiscID: lex.c v1.0 FreeBSD 2012-12-09 00:19 stable <chm@symisc.net> $ */
+/* $SymiscID: lex.c v1.0 FreeBSD 2012-12-09 00:19 stable <chm@symisc.net> $ */
 #ifndef JX9_AMALGAMATION
 #include "jx9Int.h"
 #endif
-/* This file implements a thread-safe and full reentrant lexical analyzer for the Jx9 programming language */
-/* Forward declarations */
+/* 本文件为 Jx9 编程语言实现一个线程安全且完全可重入的词法分析器 */
+/* 前向声明 */
 static sxu32 keywordCode(const char *z,int n);
 static sxi32 LexExtractNowdoc(SyStream *pStream,SyToken *pToken);
 /*
- * Tokenize a raw jx9 input.
- * Get a single low-level token from the input file. Update the stream pointer so that
- * it points to the first character beyond the extracted token.
+ * 对原始 jx9 输入进行词法分析。
+ * 从输入文件获取单个低层标记。更新流指针，使其
+ * 指向提取标记之后的第一个字符。
  */
 static sxi32 jx9TokenizeInput(SyStream *pStream,SyToken *pToken,void *pUserData,void *pCtxData)
 {

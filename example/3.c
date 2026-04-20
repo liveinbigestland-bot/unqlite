@@ -1,53 +1,45 @@
 /*
- * Compile this file together with the UnQLite database engine source code
- * to generate the executable. For example: 
+ * 将此文件与 UnQLite 数据库引擎源代码一起编译以生成可执行文件。例如：
  *  gcc -W -Wall -O6 unqlite_csr_intro.c unqlite.c -o unqlite_csr
 */
 /*
- * This simple program is a quick introduction on how to embed and start
- * experimenting with UnQLite without having to do a lot of tedious
- * reading and configuration.
+ * 这个简单的程序是对如何嵌入和开始使用 UnQLite 进行实验的快速介绍，
+ * 而无需进行大量繁琐的阅读和配置。
  *
- * Using Database Cursors:
+ * 使用数据库游标：
  *
- * Cursors provide a mechanism by which you can iterate over the records
- * in a database. Using cursors, you can seek, fetch, move, and delete
- * database records.
+ * 游标提供了一种机制，通过它可以遍历数据库中的记录。
+ * 使用游标，您可以查找、获取、移动和删除数据库记录。
  *
- * Before playing with cursors, you must first allocate a new cursor
- * handle using unqlite_kv_cursor_init().
- * This is often the first UnQLite cursor API call that an application
- * makes and is a prerequisite in order to use cursors. When done, you must
- * call unqlite_kv_cursor_release() to release any allocated resource by
- * the cursor and thus to avoid memory leaks.
+ * 在使用游标之前，您必须首先使用 unqlite_kv_cursor_init() 分配一个新的游标句柄。
+ * 这通常是应用程序进行的第一个 UnQLite 游标 API 调用，是使用游标的先决条件。
+ * 使用完毕后，您必须调用 unqlite_kv_cursor_release() 来释放游标分配的任何资源，
+ * 从而避免内存泄漏。
  *
- * To iterate over database records, from the first record to the last, simply
- * call unqlite_kv_cursor_first_entry() with successive call to unqlite_kv_cursor_next_entry()
- * until it return a value other than UNQLITE_OK (See example below).
- * Note that you can call unqlite_kv_cursor_valid_entry() to check if the cursor
- * is pointing to a valid record (This will return 1 when valid. 0 otherwise).
+ * 要遍历数据库记录（从第一条到最后一条），只需调用 unqlite_kv_cursor_first_entry()，
+ * 然后反复调用 unqlite_kv_cursor_next_entry()，直到返回 UNQLITE_OK 以外的值（见下文示例）。
+ * 请注意，您可以调用 unqlite_kv_cursor_valid_entry() 来检查游标是否指向有效记录
+ *（有效时返回 1，否则返回 0）。
  *
- * You can also use cursors to search for records and start the iteration process
- * from there. To do that, simply call unqlite_kv_cursor_seek() with the target
- * record key and the seek direction (Last argument)... 
+ * 您还可以使用游标搜索记录并从那里开始迭代过程。
+ * 为此，只需使用目标记录键和查找方向（最后一个参数）调用 unqlite_kv_cursor_seek()...
  *
- * For an introduction to the UnQLite cursor interface, please refer to:
+ * 有关 UnQLite 游标接口的介绍，请参阅：
  *        http://unqlite.org/c_api/unqlite_kv_cursor.html
- * For an introduction to the UnQLite C/C++ interface, please refer to:
+ * 有关 UnQLite C/C++ 接口的介绍，请参阅：
  *        http://unqlite.org/api_intro.html
- * For the full C/C++ API reference guide, please refer to:
+ * 有关完整的 C/C++ API 参考指南，请参阅：
  *        http://unqlite.org/c_api.html
- * UnQLite in 5 Minutes or Less:
+ * 5 分钟或更短时间内了解 UnQLite：
  *        http://unqlite.org/intro.html
- * The Architecture of the UnQLite Database Engine:
+ * UnQLite 数据库引擎的架构：
  *        http://unqlite.org/arch.html
- * For an introduction to Jx9 which is the scripting language which power
- * the Document-Store interface to UnQLite, please refer to:
+ * 有关 Jx9（为 UnQLite 的文档存储接口提供动力的脚本语言）的介绍，请参阅：
  *        http://unqlite.org/jx9.html
  */
 /* $SymiscID: unqlite_csr_intro.c v1.0 FreeBSD 2013-05-17 00:02 stable <chm@symisc.net> $ */
 /* 
- * Make sure you have the latest release of UnQLite from:
+ * 确保您有 UnQLite 的最新版本：
  *  http://unqlite.org/downloads.html
  */
 #include <stdio.h>  /* puts() */

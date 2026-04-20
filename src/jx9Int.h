@@ -1,22 +1,21 @@
 /*
- * Symisc JX9: A Highly Efficient Embeddable Scripting Engine Based on JSON.
- * Copyright (C) 2012-2013, Symisc Systems http://jx9.symisc.net/
- * Version 1.7.2
- * For information on licensing, redistribution of this file, and for a DISCLAIMER OF ALL WARRANTIES
- * please contact Symisc Systems via:
+ * Symisc JX9: 一个基于 JSON 的高效嵌入式脚本引擎。
+ * 版权所有 (C) 2012-2013, Symisc Systems http://jx9.symisc.net/
+ * 版本 1.7.2
+ * 有关许可协议、再分发和免责声明的详细信息，请联系 Symisc Systems：
  *       legal@symisc.net
  *       licensing@symisc.net
  *       contact@symisc.net
- * or visit:
+ * 或访问：
  *      http://jx9.symisc.net/
  */
  /* $SymiscID: jx9Int.h v1.9 FreeBSD 2012-08-13 23:25 devel <chm@symisc.net> $ */
 #ifndef __JX9INT_H__
 #define __JX9INT_H__
-/* Internal interface definitions for JX9. */
+/* JX9 的内部接口定义。*/
 #ifdef JX9_AMALGAMATION
 #ifndef JX9_PRIVATE
-/* Marker for routines not intended for external use */
+/* 不用于外部使用的例程标记 */
 #define JX9_PRIVATE static
 #endif /* JX9_PRIVATE */
 #else
@@ -24,13 +23,12 @@
 #include "jx9.h"
 #endif 
 #ifndef JX9_PI
-/* Value of PI */
+/* PI 的值 */
 #define JX9_PI 3.1415926535898
 #endif
 /*
- * Constants for the largest and smallest possible 64-bit signed integers.
- * These macros are designed to work correctly on both 32-bit and 64-bit
- * compilers.
+ * 64 位有符号整数最大和最小可能的常量。
+ * 这些宏旨在在 32 位和 64 位编译器上都能正确工作。
  */
 #ifndef LARGEST_INT64
 #define LARGEST_INT64  (0xffffffff|(((sxi64)0x7fffffff)<<32))
@@ -38,30 +36,30 @@
 #ifndef SMALLEST_INT64
 #define SMALLEST_INT64 (((sxi64)-1) - LARGEST_INT64)
 #endif
-/* Forward declaration of private structures */
+/* 私有结构的前向声明 */
 typedef struct jx9_foreach_info   jx9_foreach_info;
 typedef struct jx9_foreach_step   jx9_foreach_step;
 typedef struct jx9_hashmap_node   jx9_hashmap_node;
 typedef struct jx9_hashmap        jx9_hashmap;
-/* Symisc Standard types */
+/* Symisc 标准类型 */
 #if !defined(SYMISC_STD_TYPES)
 #define SYMISC_STD_TYPES
 #ifdef __WINNT__
-/* Disable nuisance warnings on Borland compilers */
+/* 禁用 Borland 编译器的讨厌警告 */
 #if defined(__BORLANDC__)
-#pragma warn -rch /* unreachable code */
-#pragma warn -ccc /* Condition is always true or false */
-#pragma warn -aus /* Assigned value is never used */
-#pragma warn -csu /* Comparing signed and unsigned */
-#pragma warn -spa /* Suspicious pointer arithmetic */
+#pragma warn -rch /* 不可达代码 */
+#pragma warn -ccc /* 条件始终为真或假 */
+#pragma warn -aus /* 分配的值从未使用 */
+#pragma warn -csu /* 比较有符号和无符号 */
+#pragma warn -spa /* 可疑的指针算术 */
 #endif
 #endif
-typedef signed char        sxi8; /* signed char */
-typedef unsigned char      sxu8; /* unsigned char */
-typedef signed short int   sxi16; /* 16 bits(2 bytes) signed integer */
-typedef unsigned short int sxu16; /* 16 bits(2 bytes) unsigned integer */
-typedef int                sxi32; /* 32 bits(4 bytes) integer */
-typedef unsigned int       sxu32; /* 32 bits(4 bytes) unsigned integer */
+typedef signed char        sxi8; /* 有符号字符 */
+typedef unsigned char      sxu8; /* 无符号字符 */
+typedef signed short int   sxi16; /* 16 位（2 字节）有符号整数 */
+typedef unsigned short int sxu16; /* 16 位（2 字节）无符号整数 */
+typedef int                sxi32; /* 32 位（4 字节）整数 */
+typedef unsigned int       sxu32; /* 32 位（4 字节）无符号整数 */
 typedef long               sxptr;
 typedef unsigned long      sxuptr;
 typedef long               sxlong;
@@ -85,8 +83,7 @@ typedef double             sxreal;
 #define FALSE 0
 #endif
 /*
- * The following macros are used to cast pointers to integers and
- * integers to pointers.
+ * 以下宏用于将指针转换为整数和将整数转换为指针。
  */
 #if defined(__PTRDIFF_TYPE__)  
 # define SX_INT_TO_PTR(X)  ((void*)(__PTRDIFF_TYPE__)(X))
@@ -150,7 +147,7 @@ typedef sxi32 (*ProcRawStrCmp)(const SyString *, const SyString *);
 typedef struct SyMemBackend SyMemBackend;
 typedef struct SyBlob SyBlob;
 typedef struct SySet SySet;
-/* Standard function signatures */
+/* 标准函数签名 */
 typedef sxi32 (*ProcCmp)(const void *, const void *, sxu32);
 typedef sxi32 (*ProcPatternMatch)(const char *, sxu32, const char *, sxu32, sxu32 *);
 typedef sxi32 (*ProcSearch)(const void *, sxu32, const void *, sxu32, ProcCmp, sxu32 *);
@@ -175,17 +172,17 @@ typedef sxi32 (*ProcSort)(void *, sxu32, sxu32, ProcCmp);
 	if( Item->pPrev ){ Item->pPrev->pNext = Item->pNext;}\
 	if( Item->pNext ){ Item->pNext->pPrev = Item->pPrev;}
 /*
- * A generic dynamic set.
+ * 通用动态集合。
  */
 struct SySet
 {
-	SyMemBackend *pAllocator; /* Memory backend */
-	void *pBase;              /* Base pointer */	
-	sxu32 nUsed;              /* Total number of used slots  */
-	sxu32 nSize;              /* Total number of available slots */
-	sxu32 eSize;              /* Size of a single slot */
-	sxu32 nCursor;	          /* Loop cursor */	
-	void *pUserData;          /* User private data associated with this container */
+	SyMemBackend *pAllocator; /* 内存后端 */
+	void *pBase;              /* 基指针 */	
+	sxu32 nUsed;              /* 已使用槽的总数  */
+	sxu32 nSize;              /* 可用槽的总数 */
+	sxu32 eSize;              /* 单个槽的大小 */
+	sxu32 nCursor;	          /* 循环游标 */	
+	void *pUserData;          /* 与此容器关联的用户私有数据 */
 };
 #define SySetBasePtr(S)           ((S)->pBase)
 #define SySetBasePtrJump(S, OFFT)  (&((char *)(S)->pBase)[OFFT*(S)->eSize])

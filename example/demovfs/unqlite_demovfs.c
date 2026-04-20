@@ -1,53 +1,48 @@
 /*
-** 2015 June 12
-** Author: Luca Sturaro 
-** Based and "heavily inspired" by test_demovfs.c for SQLite3 (http://www.sqlite.org/vfs.html)
-** 
+** 2015 年 6 月 12 日
+** 作者: Luca Sturaro
+** 基于并"大量借鉴"自 SQLite3 的 test_demovfs.c (http://www.sqlite.org/vfs.html)
+**
 **
 *************************************************************************
 **
-** This file implements an example of a simple VFS following "litterally" 
-** the test_demovfs for SQLite3. This works because UnQLite is based 
-** on a similar implementation too. It has been created following the
-** Unix POSIX calls but it can be changed for further customizations so 
-** this will not compile under Windows systems. 
-** 
-** Compile this file together with the UnQLite database engine source code
-** to generate the executable. For example: 
+** 本文件实现了一个简单 VFS 的示例，基本照搬了 SQLite3 的 test_demovfs。
+** 这是可行的，因为 UnQLite 也是基于类似的实现。
+** 它遵循 Unix POSIX 调用创建，但可以为进一步定制而修改，
+** 因此无法在 Windows 系统下编译。
+**
+** 将本文件与 UnQLite 数据库引擎源代码一起编译以生成可执行文件。
+** 例如:
 **  gcc unqlite_demovfs.c unqlite.c -o unqlite_demovfs
 **
-** We can pass a CFLAG for customization: HAVE_FTRUNCATE
+** 我们可以传入 CFLAG 进行定制: HAVE_FTRUNCATE
 **
 **
 **
-** OVERVIEW
+** 概述
 **
-**   The code in this file implements a minimal UNQLITE VFS that can be 
-**   used on Linux and other posix-like operating systems. The following 
-**   system calls are used:
+**   本文件中的代码实现了一个最小化的 UNQLITE VFS，可用于
+**   Linux 和其他类 POSIX 操作系统。使用以下系统调用：
 **
-**    File-system: access(), unlink(), getcwd()
-**    File IO:     open(), read(), write(), fsync(), close(), fstat()
-**    Other:       sleep(), usleep(), time()
+**    文件系统: access(), unlink(), getcwd()
+**    文件 IO:   open(), read(), write(), fsync(), close(), fstat()
+**    其他:      sleep(), usleep(), time()
 **
-**   The following VFS features are omitted:
+**   以下 VFS 功能被省略：
 **
-**     1. File locking. The user must ensure that there is at most one
-**        connection to each database when using this VFS. 
+**     1. 文件锁定。使用此 VFS 时，用户必须确保每个数据库最多只有一个连接。
 **
-**     2. This does not port Jx9 engine vfs. This is for UnQLite DBMS only.
+**     2. 这不移植 Jx9 引擎 vfs。仅适用于 UnQLite DBMS。
 **
 **
 **
-**   It is assumed that the system uses UNIX-like path-names. Specifically,
-**   that '/' characters are used to separate path components and that
-**   a path-name is a relative path unless it begins with a '/'. And that
-**   no UTF-8 encoded paths are greater than 512 bytes in length.
+**   假定系统使用类 Unix 路径名。具体来说，
+**   '/' 字符用于分隔路径组件，除非路径以 '/' 开头，否则为相对路径。
+**   并且 UTF-8 编码的路径不超过 512 字节。
 **
-**   Code in this file allocates a fixed size buffer of 
-**   UNQLITE_DEMOVFS_BUFFERSZ using unqlite_malloc() whenever a
-**   file is opened. It uses the buffer to aggregate sequential
-**   writes into aligned UNQLITE_DEMOVFS_BUFFERSZ blocks. When UnQLite
+**   本文件中的代码在打开文件时使用 unqlite_malloc() 分配固定大小的缓冲区
+**   UNQLITE_DEMOVFS_BUFFERSZ。它使用缓冲区将顺序写入聚合为对齐的
+**   UNQLITE_DEMOVFS_BUFFERSZ 块。当 UnQLite
 **   invokes the xSync() method to sync the contents of the file to disk,
 **   all accumulated data is written out, even if it does not constitute
 **   a complete block.

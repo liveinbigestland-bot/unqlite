@@ -1,60 +1,57 @@
 /*
- * Compile this file together with the UnQLite database engine source code
- * to generate the executable. For example: 
+ * 将本文件与 UnQLite 数据库引擎源代码一起编译以生成可执行文件。
+ * 例如：
  *  gcc -W -Wall -O6 unqlite_func_intro.c unqlite.c -o unqlite_unqlite_func
 */
 /*
- * This simple program is a quick introduction on how to embed and start
- * experimenting with UnQLite without having to do a lot of tedious
- * reading and configuration.
+ * 这个简单的程序是对如何嵌入和使用 UnQLite 的快速介绍，
+ * 无需进行大量繁琐的阅读和配置。
  *
- * Introduction to the UnQLite (Via Jx9) Foreign Function Mechanism:
+ * UnQLite（通过 Jx9）外部函数机制介绍：
  *
- * The Document store to UnQLite which is used to store JSON docs (i.e. Objects, Arrays, Strings, etc.)
- * in the database is powered by the Jx9 programming language.
+ * UnQLite 的文档存储用于在数据库中存储 JSON 文档（即对象、数组、字符串等），
+ * 由 Jx9 编程语言提供支持。
  *
- * Jx9 is an embeddable scripting language also called extension language designed
- * to support general procedural programming with data description facilities.
- * Jx9 is a Turing-Complete, dynamically typed programming language based on JSON
- * and implemented as a library in the UnQLite core.
+ * Jx9 是一个嵌入式脚本语言，也称为扩展语言，旨在支持
+ * 具有数据描述功能的一般过程式编程。
+ * Jx9 是一个基于 JSON 的图灵完备、动态类型编程语言，
+ * 作为库在 UnQLite 核心中实现。
  *
- * Jx9 is built with a tons of features and has a clean and familiar syntax similar
- * to C and Javascript.
- * Being an extension language, Jx9 has no notion of a main program, it only works
- * embedded in a host application.
- * The host program (UnQLite in our case) can write and read Jx9 variables and can
- * register C/C++ functions to be called by Jx9 code. 
+ * Jx9 构建了大量的功能，具有类似于 C 和 Javascript 的简洁熟悉的语法。
+ * 作为扩展语言，Jx9 没有主程序的概念，只能在宿主应用程序中运行。
+ * 宿主程序（在本例中为 UnQLite）可以写入和读取 Jx9 变量，
+ * 还可以注册由 Jx9 代码调用的 C/C++ 函数。
  *
- * Foreign functions are used to add Jx9 functions or to redefine the behavior of existing
- * Jx9 functions from the outside environment (see below) to the underlying virtual machine.
- * This mechanism is know as "In-process extending". After successful call to [unqlite_create_function()],
- * the installed function is available immediately and can be called from the target Jx9 code.
- * 
- * For an introductory course to the [unqlite_create_function()] interface and the foreign
- * function mechanism in general, please refer to:
+ * 外部函数用于从外部环境添加 Jx9 函数或重新定义现有
+ * Jx9 函数的行为（见下文）。
+ * 这种机制被称为"进程内扩展"。成功调用 [unqlite_create_function()] 后，
+ * 安装的函数立即可用，可以从目标 Jx9 代码中调用。
+ *
+ * 有关 [unqlite_create_function()] 接口和外部函数机制的介绍性教程，
+ * 请参阅：
  *        http://unqlite.org/func_intro.html
- * For an introduction to the UnQLite C/C++ interface, please refer to:
+ * 有关 UnQLite C/C++ 接口的介绍，请参阅：
  *        http://unqlite.org/api_intro.html
- * For an introduction to Jx9, please refer to:
+ * 有关 Jx9 的介绍，请参阅：
  *        http://unqlite.org/unqlite.html
- * For the full C/C++ API reference guide, please refer to:
+ * 有关完整的 C/C++ API 参考指南，请参阅：
  *        http://unqlite.org/c_api.html
- * UnQLite in 5 Minutes or Less:
+ * UnQLite 5 分钟快速入门：
  *        http://unqlite.org/intro.html
- * The Architecture of the UnQLite Database Engine:
+ * UnQLite 数据库引擎架构：
  *        http://unqlite.org/arch.html
  */
 /* $SymiscID: unqlite_func_intro.c v1.7 Linux 2013-05-17 03:17 stable <chm@symisc.net> $ */
-/* 
- * Make sure you have the latest release of UnQLite from:
+/*
+ * 请确保使用最新版本的 UnQLite：
  *  http://unqlite.org/downloads.html
  */
 #include <stdio.h>  /* puts() */
 #include <stdlib.h> /* exit() */
-/* Make sure this header file is available.*/
+/* 确保此头文件可用。*/
 #include "unqlite.h"
 /*
- * Banner.
+ * 横幅。
  */
 static const char zBanner[] = {
 	"============================================================\n"
@@ -63,90 +60,88 @@ static const char zBanner[] = {
 	"============================================================\n"
 };
 /*
- * Extract the database error log and exit.
+ * 提取数据库错误日志并退出。
  */
 static void Fatal(unqlite *pDb,const char *zMsg)
 {
 	if( pDb ){
 		const char *zErr;
-		int iLen = 0; /* Stupid cc warning */
+		int iLen = 0; /* 愚蠢的 cc 警告 */
 
-		/* Extract the database error log */
+		/* 提取数据库错误日志 */
 		unqlite_config(pDb,UNQLITE_CONFIG_ERR_LOG,&zErr,&iLen);
 		if( iLen > 0 ){
-			/* Output the DB error log */
-			puts(zErr); /* Always null terminated */
+			/* 输出数据库错误日志 */
+			puts(zErr); /* 始终以 null 终止 */
 		}
 	}else{
 		if( zMsg ){
 			puts(zMsg);
 		}
 	}
-	/* Manually shutdown the library */
+	/* 手动关闭库 */
 	unqlite_lib_shutdown();
-	/* Exit immediately */
+	/* 立即退出 */
 	exit(0);
 }
 /*
  * int shift_func(int $num)
- *  Right shift a number by one and return the result.
- * Description
- *  Our first function perform a simple right shift operation on a given number
- *  and return that number shifted by one.
- *  This function expects a single parameter which must be numeric (either integer or float
- *  or a string that looks like a number).
- * Parameter
+ *  将数字右移一位并返回结果。
+ * 说明
+ *  我们的第一个函数对给定数字执行简单的右移操作
+ *  并返回移位后的数字。
+ *  此函数期望一个参数，必须是数字类型（整数、浮点数
+ *  或看起来像数字的字符串）。
+ * 参数
  *  $num
- *   Number to shift by one.
- * Return value
- *   Integer: Given number shifted by one.
- * Usage example:
- *   print shift_func(150); //Output 300
- *   print shift_func(50);  //Output 100
+ *   要移位的数字。
+ * 返回值
+ *   整数：给定数字左移一位（即乘以2）的结果。
+ * 用法示例：
+ *   print shift_func(150); //输出 300
+ *   print shift_func(50);  //输出 100
  */
 int shift_func(
-	unqlite_context *pCtx, /* Call Context */
-	int argc,          /* Total number of arguments passed to the function */
-	unqlite_value **argv   /* Array of function arguments */
+	unqlite_context *pCtx, /* 调用上下文 */
+	int argc,          /* 传递给函数的参数总数 */
+	unqlite_value **argv   /* 函数参数数组 */
 	)
 {
 	int num;
-	/* Make sure there is at least one argument and is of the
-	 * expected type [i.e: numeric].
-	 */
+	/* 确保至少有一个参数且类型符合预期 [即：数字]。 */
 	if( argc < 1 || !unqlite_value_is_numeric(argv[0]) ){
 		/*
-		 * Missing/Invalid argument, throw a warning and return FALSE.
-		 * Note that you do not need to log the function name, UnQLite will
-		 * automatically append the function name for you.
+		 * 缺少/无效参数，抛出警告并返回 FALSE。
+		 * 注意：您不需要记录函数名，UnQLite 会
+		 * 自动为您附加函数名。
 		 */
-		unqlite_context_throw_error(pCtx, UNQLITE_CTX_WARNING, "Missing numeric argument");
-		/* Return false */
+		unqlite_context_throw_error(pCtx, UNQLITE_CTX_WARNING, "缺少数字参数");
+		/* 返回 false */
 		unqlite_result_bool(pCtx, 0);
 		return UNQLITE_OK;
 	}
-	/* Extract the number */
+	/* 提取数字 */
 	num = unqlite_value_to_int(argv[0]);
-	/* Shift by 1 */
+	/* 左移 1 位（乘以2）*/
 	num <<= 1;
-	/* Return the new value */
+	/* 返回新值 */
 	unqlite_result_int(pCtx, num);
-	/* All done */
+	/* 完成 */
 	return UNQLITE_OK;
 }
 #include <time.h>
 /*
  * string date_func(void)
- *  Return the current system date.
- * Description
- *  Our second function does not expects arguments and return the
- *  current system date.
- * Parameter
- *  None
- * Return value
- *   String: Current system date.
- * Usage example
- *   print date_func(); //would output: 2012-23-09 14:53:30
+ *  返回当前系统日期。
+ * 说明
+ *  我们的第二个函数不接受参数并返回
+ *  当前系统日期。
+ * 参数
+ *  无
+ * 返回值
+ *   字符串：当前系统日期。
+ * 用法示例
+ *   print date_func(); //可能输出：2012-23-09 14:53:30
  */
 int date_func(
 	unqlite_context *pCtx, /* Call Context */
@@ -186,17 +181,17 @@ int date_func(
 }
 /*
  * int64 sum_func(int $arg1, int $arg2, int $arg3, ...)
- *  Return the sum of the given arguments.
- * Description
- *  This function expects a variable number of arguments which must be of type
- *  numeric (either integer or float or a string that looks like a number) and
- *  returns the sum of the given numbers.
- * Parameter 
- *   int $n1, n2, ... (Variable number of arguments)
- * Return value
- *   Integer64: Sum of the given numbers.
- * Usage example
- *   print sum_func(7, 8, 9, 10); //would output 34
+ *  返回给定参数的总和。
+ * 说明
+ *  此函数期望可变数量的参数，参数必须是数字类型
+ *  （整数、浮点数或看起来像数字的字符串），
+ *  并返回给定数字的总和。
+ * 参数
+ *   int $n1, n2, ...（可变数量的参数）
+ * 返回值
+ *   Integer64：给定数字的总和。
+ * 用法示例
+ *   print sum_func(7, 8, 9, 10); //可能输出 34
  */
 int sum_func(unqlite_context *pCtx, int argc, unqlite_value **argv)
 {
@@ -238,19 +233,19 @@ int sum_func(unqlite_context *pCtx, int argc, unqlite_value **argv)
 }
 /*
  * array array_time_func(void)
- *  Return the current system time in a JSON array.
- * Description
- *  This function does not expects arguments and return the
- *  current system time in an array.
- * Parameter
- *  None
- * Return value
- *   Array holding the current system time.
- * Usage example
- * 
- *   print array_time_func() ; 
- * 
- * When running you should see something like that:
+ *  以 JSON 数组形式返回当前系统时间。
+ * 说明
+ *  此函数不接受参数并以数组形式返回
+ *  当前系统时间。
+ * 参数
+ *  无
+ * 返回值
+ *   包含当前系统时间的数组。
+ * 用法示例
+ *
+ *   print array_time_func() ;
+ *
+ * 运行时应看到类似以下内容：
  * JSON array(3) [14,53,30]
  */
 int array_time_func(unqlite_context *pCtx, int argc, unqlite_value **argv)
@@ -318,20 +313,20 @@ int array_time_func(unqlite_context *pCtx, int argc, unqlite_value **argv)
 }
 /*
  * object object_date_func(void)
- *  Return a copy of the 'struct tm' structure in a JSON array.
- * Description
- *  This function does not expects arguments and return a copy of
- *  the 'struct tm' structure found in the 'time.h' header file.
- *  This structure hold the current system date&time.
- * Parameter
- *  None
- * Return value
- *   Associative array holding a copy of the 'struct tm' structure.
- * Usage example
- * 
+ *  以 JSON 数组形式返回 'struct tm' 结构的副本。
+ * 说明
+ *  此函数不接受参数并返回
+ *  'time.h' 头文件中 'struct tm' 结构的副本。
+ *  此结构保存当前系统日期和时间。
+ * 参数
+ *  无
+ * 返回值
+ *   包含 'struct tm' 结构副本的关联数组。
+ * 用法示例
+ *
  *   print object_date_func();
- * 
- * When running you should see something like that:
+ *
+ * 运行时应看到类似以下内容：
  * JSON Object(6 {
  *  "tm_year":2012,
  *  "tm_mon":12,
@@ -420,20 +415,20 @@ int object_date_func(unqlite_context *pCtx, int argc /* unused */, unqlite_value
 }
 /*
  * array array_string_split(string $str)
- *  Return a copy of each string character in an array.
- * Description
- *  This function splits a given string to its
- *  characters and return the result in an array.
- * Parameter
+ *  返回字符串每个字符组成的数组副本。
+ * 说明
+ *  此函数将给定字符串分割为
+ *  各个字符并以数组形式返回结果。
+ * 参数
  *  $str
- *     Target string to split.
- * Return value
- *   Array holding string characters.
- * Usage example
- * 
- *   print array_str_split('Hello'); 
- * 
- * When running you should see something like that:
+ *     要分割的目标字符串。
+ * 返回值
+ *   包含字符串字符的数组。
+ * 用法示例
+ *
+ *   print array_str_split('Hello');
+ *
+ * 运行时应看到类似以下内容：
  *   JSON Array(5 ["H","e","l","l","o"])
  */
 int array_string_split_func(unqlite_context *pCtx, int argc, unqlite_value **argv)
@@ -492,10 +487,10 @@ int array_string_split_func(unqlite_context *pCtx, int argc, unqlite_value **arg
 	 */
 	return UNQLITE_OK;
 }
-/* 
- * Container for the foreign functions defined above.
- * These functions will be registered later using a call
- * to [unqlite_create_function()].
+/*
+ * 上面定义的外部函数的容器。
+ * 这些函数稍后将使用调用
+ * [unqlite_create_function()] 注册。
  */
 static const struct foreign_func {
 	const char *zName; /* Name of the foreign function*/
@@ -511,9 +506,9 @@ static const struct foreign_func {
 /* Forward declaration: VM output consumer callback */
 static int VmOutputConsumer(const void *pOutput,unsigned int nOutLen,void *pUserData /* Unused */);
 /*
- * The following is the Jx9 Program to be executed later by the UnQLite VM:
- * 
- * //Test the foreign function mechanism
+ * 以下是由 UnQLite VM 稍后执行的 Jx9 程序：
+ *
+ * //测试外部函数机制
  *  print 'shift_func(150) = ' .. shift_func(150) .. JX9_EOL;
  *  print 'sum_func(7,8,9,10) = ' .. sum_func(7,8,9,10) .. JX9_EOL;
  *  print 'date_func(5) = ' .. date_func() .. JX9_EOL;
@@ -522,9 +517,9 @@ static int VmOutputConsumer(const void *pOutput,unsigned int nOutLen,void *pUser
  *  dump(object_date_func());
  *  print 'array_str_split('Hello') ='  .. JX9_EOL;
  *  dump(array_str_split('Hello'))
- *  
- * When running, you should see something like that:
- *	
+ *
+ * 运行时应看到类似以下内容：
+ *
  * shift_func(150) = 300
  * sum_func(7,8,9,10) = 34
  * date_func(5) = 2013-06-12 01:13:58
@@ -541,8 +536,8 @@ static int VmOutputConsumer(const void *pOutput,unsigned int nOutLen,void *pUser
  * )
  * array_str_split('Hello') =
  *  JSON Array(5 ["H","e","l","l","o"])
- * 
- * Note: '..' (Two dots) is the concatenation operator (i.e '+' for Javascript) 
+ *
+ * 注意：'..'（两个点）是连接运算符（即相当于 Javascript 中的 '+'）
  */
 #define JX9_PROG \
   "print 'shift_func(150) = ' .. shift_func(150) .. JX9_EOL;"\
@@ -554,62 +549,62 @@ static int VmOutputConsumer(const void *pOutput,unsigned int nOutLen,void *pUser
   "print 'array_str_split(\\'Hello\\') =' .. JX9_EOL;"\
   "dump(array_str_split('Hello'));"
 
- /* No need for command line arguments, everything is stored in-memory */
+ /* 无需命令行参数，所有内容都存储在内存中 */
 int main(void)
 {
-	unqlite *pDb;       /* Database handle */
-	unqlite_vm *pVm;    /* UnQLite VM resulting from successful compilation of the target Jx9 script */
+	unqlite *pDb;       /* 数据库句柄 */
+	unqlite_vm *pVm;    /* 成功编译目标 Jx9 脚本产生的 UnQLite VM */
 	int i,rc;
 
 	puts(zBanner);
 
-	/* Open our database */
-	rc = unqlite_open(&pDb,":mem:" /* In-mem DB */,UNQLITE_OPEN_CREATE);
+	/* 打开我们的数据库 */
+	rc = unqlite_open(&pDb,":mem:" /* 内存数据库 */,UNQLITE_OPEN_CREATE);
 	if( rc != UNQLITE_OK ){
-		Fatal(0,"Out of memory");
+		Fatal(0,"内存不足");
 	}
-	
-	/* Compile our Jx9 script defined above */
+
+	/* 编译上面定义的 Jx9 脚本 */
 	rc = unqlite_compile(pDb,JX9_PROG,sizeof(JX9_PROG)-1,&pVm);
 	if( rc != UNQLITE_OK ){
-		/* Compile error, extract the compiler error log */
+		/* 编译错误，提取编译器错误日志 */
 		const char *zBuf;
 		int iLen;
-		/* Extract error log */
+		/* 提取错误日志 */
 		unqlite_config(pDb,UNQLITE_CONFIG_JX9_ERR_LOG,&zBuf,&iLen);
 		if( iLen > 0 ){
 			puts(zBuf);
 		}
-		Fatal(0,"Jx9 compile error");
+		Fatal(0,"Jx9 编译错误");
 	}
 
-	/* Now we have our program compiled, it's time to register 
-	 * our foreign functions.
+	/* 现在我们的程序已编译，是时候注册
+	 * 我们的外部函数了。
 	 */
 	for( i = 0 ; i < (int)sizeof(aFunc)/sizeof(aFunc[0]) ;  ++i ){
-		/* Install the foreign function */
-		rc = unqlite_create_function(pVm, aFunc[i].zName, aFunc[i].xProc, 0 /* NULL: No private data */);
+		/* 安装外部函数 */
+		rc = unqlite_create_function(pVm, aFunc[i].zName, aFunc[i].xProc, 0 /* NULL：无私有数据 */);
 		if( rc != UNQLITE_OK ){
-			Fatal(pDb,"Error while registering foreign functions");
+			Fatal(pDb,"注册外部函数时出错");
 		}
 	}
 
-	/* Install a VM output consumer callback */
+	/* 安装 VM 输出消费者回调 */
 	rc = unqlite_vm_config(pVm,UNQLITE_VM_CONFIG_OUTPUT,VmOutputConsumer,0);
 	if( rc != UNQLITE_OK ){
 		Fatal(pDb,0);
 	}
-	
-	/* Execute our script */
+
+	/* 执行我们的脚本 */
 	rc = unqlite_vm_exec(pVm);
 	if( rc != UNQLITE_OK ){
 		Fatal(pDb,0);
 	}
 
-	/* Release our VM */
+	/* 释放我们的 VM */
 	unqlite_vm_release(pVm);
-	
-	/* Auto-commit the transaction and close our database */
+
+	/* 自动提交事务并关闭我们的数据库 */
 	unqlite_close(pDb);
 	return 0;
 }
@@ -617,44 +612,43 @@ int main(void)
 #ifdef __WINNT__
 #include <Windows.h>
 #else
-/* Assume UNIX */
+/* 假定 UNIX */
 #include <unistd.h>
 #endif
 /*
- * The following define is used by the UNIX build process and have
- * no particular meaning on windows.
+ * 以下定义由 UNIX 构建过程使用，
+ * 在 Windows 上没有特殊含义。
  */
 #ifndef STDOUT_FILENO
 #define STDOUT_FILENO	1
 #endif
 /*
- * VM output consumer callback.
- * Each time the UnQLite VM generates some outputs, the following
- * function gets called by the underlying virtual machine to consume
- * the generated output.
+ * VM 输出消费者回调。
+ * 每次 UnQLite VM 生成一些输出时，
+ * 下面的函数会被底层虚拟机调用以消费生成的输出。
  *
- * All this function does is redirecting the VM output to STDOUT.
- * This function is registered via a call to [unqlite_vm_config()]
- * with a configuration verb set to: UNQLITE_VM_CONFIG_OUTPUT.
+ * 此函数所做的只是将 VM 输出重定向到 STDOUT。
+ * 此函数通过调用 [unqlite_vm_config()]
+ * 注册，配置动词设置为：UNQLITE_VM_CONFIG_OUTPUT。
  */
-static int VmOutputConsumer(const void *pOutput,unsigned int nOutLen,void *pUserData /* Unused */)
+static int VmOutputConsumer(const void *pOutput,unsigned int nOutLen,void *pUserData /* 未使用 */)
 {
 #ifdef __WINNT__
 	BOOL rc;
 	rc = WriteFile(GetStdHandle(STD_OUTPUT_HANDLE),pOutput,(DWORD)nOutLen,0,0);
 	if( !rc ){
-		/* Abort processing */
+		/* 中止处理 */
 		return UNQLITE_ABORT;
 	}
 #else
 	ssize_t nWr;
 	nWr = write(STDOUT_FILENO,pOutput,nOutLen);
 	if( nWr < 0 ){
-		/* Abort processing */
+		/* 中止处理 */
 		return UNQLITE_ABORT;
 	}
 #endif /* __WINT__ */
-	
-	/* All done, data was redirected to STDOUT */
+
+	/* 完成，数据已重定向到 STDOUT */
 	return UNQLITE_OK;
 }

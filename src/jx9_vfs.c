@@ -1,25 +1,23 @@
 /*
- * Symisc JX9: A Highly Efficient Embeddable Scripting Engine Based on JSON.
- * Copyright (C) 2012-2013, Symisc Systems http://jx9.symisc.net/
- * Version 1.7.2
- * For information on licensing, redistribution of this file, and for a DISCLAIMER OF ALL WARRANTIES
- * please contact Symisc Systems via:
+ * Symisc JX9: 一个基于 JSON 的高效嵌入式脚本引擎。
+ * 版权所有 (C) 2012-2013, Symisc Systems http://jx9.symisc.net/
+ * 版本 1.7.2
+ * 有关许可协议、再分发和免责声明的详细信息，请联系 Symisc Systems：
  *       legal@symisc.net
  *       licensing@symisc.net
  *       contact@symisc.net
- * or visit:
+ * 或访问：
  *      http://jx9.symisc.net/
  */
- /* $SymiscID: vfs.c v2.1 Ubuntu 2012-12-13 00:013 stable <chm@symisc.net> $ */
+/* $SymiscID: vfs.c v2.1 Ubuntu 2012-12-13 00:013 stable <chm@symisc.net> $ */
 #ifndef JX9_AMALGAMATION
 #include "jx9Int.h"
 #endif
 /*
- * This file implement a virtual file systems (VFS) for the JX9 engine.
+ * 本文件为 JX9 引擎实现了虚拟文件系统 (VFS)。
  */
 /*
- * Given a string containing the path of a file or directory, this function 
- * return the parent directory's path.
+ * 给定一个包含文件或目录路径的字符串，此函数返回父目录的路径。
  */
 JX9_PRIVATE const char * jx9ExtractDirName(const char *zPath, int nByte, int *pLen)
 {

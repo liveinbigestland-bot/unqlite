@@ -1,19 +1,18 @@
 /*
- * Symisc unQLite: An Embeddable NoSQL (Post Modern) Database Engine.
- * Copyright (C) 2012-2013, Symisc Systems http://unqlite.org/
- * Version 1.1.6
- * For information on licensing, redistribution of this file, and for a DISCLAIMER OF ALL WARRANTIES
- * please contact Symisc Systems via:
+ * Symisc unQLite: 一个嵌入式 NoSQL（后现代）数据库引擎。
+ * 版权所有 (C) 2012-2013, Symisc Systems http://unqlite.org/
+ * 版本 1.1.6
+ * 有关许可协议、再分发和免责声明的详细信息，请联系 Symisc Systems：
  *       legal@symisc.net
  *       licensing@symisc.net
  *       contact@symisc.net
- * or visit:
+ * 或访问：
  *      http://unqlite.org/licensing.html
  */
  /* $SymiscID: unqliteInt.h v1.7 FreeBSD 2012-11-02 11:25 devel <chm@symisc.net> $ */
 #ifndef __UNQLITEINT_H__
 #define __UNQLITEINT_H__
-/* Internal interface definitions for UnQLite. */
+/* UnQLite 的内部接口定义。*/
 #ifdef UNQLITE_AMALGAMATION
 /* Marker for routines not intended for external use */
 #define UNQLITE_PRIVATE static
@@ -23,24 +22,20 @@
 #include "unqlite.h"
 #include "jx9Int.h"
 #endif 
-/* forward declaration */
+/* 前向声明 */
 typedef struct unqlite_db unqlite_db;
 /*
-** The following values may be passed as the second argument to
-** UnqliteOsLock(). The various locks exhibit the following semantics:
+** 以下值可以作为第二个参数传递给 UnqliteOsLock()。各种锁具有以下语义：
 **
-** SHARED:    Any number of processes may hold a SHARED lock simultaneously.
-** RESERVED:  A single process may hold a RESERVED lock on a file at
-**            any time. Other processes may hold and obtain new SHARED locks.
-** PENDING:   A single process may hold a PENDING lock on a file at
-**            any one time. Existing SHARED locks may persist, but no new
-**            SHARED locks may be obtained by other processes.
-** EXCLUSIVE: An EXCLUSIVE lock precludes all other locks.
+** SHARED:    任意数量的进程可以同时持有 SHARED 锁。
+** RESERVED:  单个进程可以在任何时候持有 RESERVED 锁。
+**            其他进程可以持有并获取新的 SHARED 锁。
+** PENDING:   单个进程可以在任何时候持有 PENDING 锁。
+**            现有的 SHARED 锁可以存在，但其他进程不能获取新的 SHARED 锁。
+** EXCLUSIVE: EXCLUSIVE 锁排除所有其他锁。
 **
-** PENDING_LOCK may not be passed directly to UnqliteOsLock(). Instead, a
-** process that requests an EXCLUSIVE lock may actually obtain a PENDING
-** lock. This can be upgraded to an EXCLUSIVE lock by a subsequent call to
-** UnqliteOsLock().
+** PENDING_LOCK 不能直接传递给 UnqliteOsLock()。相反，请求 EXCLUSIVE 锁的进程
+** 实际上可能获得 PENDING 锁。这可以通过后续调用 UnqliteOsLock() 升级为 EXCLUSIVE 锁。
 */
 #define NO_LOCK         0
 #define SHARED_LOCK     1
@@ -48,54 +43,44 @@ typedef struct unqlite_db unqlite_db;
 #define PENDING_LOCK    3
 #define EXCLUSIVE_LOCK  4
 /*
- * UnQLite Locking Strategy (Same as SQLite3)
+ * UnQLite 锁定策略（与 SQLite3 相同）
  *
- * The following #defines specify the range of bytes used for locking.
- * SHARED_SIZE is the number of bytes available in the pool from which
- * a random byte is selected for a shared lock.  The pool of bytes for
- * shared locks begins at SHARED_FIRST. 
+ * 以下 #defines 指定用于锁定的字节范围。
+ * SHARED_SIZE 是池中可用字节的数量，从中选择一个随机字节用于共享锁。
+ * 共享锁的字节池从 SHARED_FIRST 开始。
  *
- * The same locking strategy and byte ranges are used for Unix and Windows.
- * This leaves open the possiblity of having clients on winNT, and
- * unix all talking to the same shared file and all locking correctly.
- * To do so would require that samba (or whatever
- * tool is being used for file sharing) implements locks correctly between
- * windows and unix.  I'm guessing that isn't likely to happen, but by
- * using the same locking range we are at least open to the possibility.
+ * Unix 和 Windows 使用相同的锁定策略和字节范围。
+ * 这留下了让 winNT 和 unix 上的客户端都能正确锁定地与相同共享文件通信的可能性。
+ * 要做到这一点，需要 samba（或用于文件共享的任何工具）在 windows 和 unix 之间正确实现锁定。
+ * 我猜这不太可能发生，但通过使用相同的锁定范围，我们至少开放了这种可能性。
  *
- * Locking in windows is mandatory.  For this reason, we cannot store
- * actual data in the bytes used for locking.  The pager never allocates
- * the pages involved in locking therefore.  SHARED_SIZE is selected so
- * that all locks will fit on a single page even at the minimum page size.
- * PENDING_BYTE defines the beginning of the locks.  By default PENDING_BYTE
- * is set high so that we don't have to allocate an unused page except
- * for very large databases.  But one should test the page skipping logic 
- * by setting PENDING_BYTE low and running the entire regression suite.
+ * Windows 中的锁定是强制性的。因此，我们不能将实际数据存储在用于锁定的字节中。
+ * 因此，pager 从不分配涉及锁定的页面。选择 SHARED_SIZE 是为了使所有锁
+ * 即使在最小页面大小下也能容纳在单个页面上。
+ * PENDING_BYTE 定义锁的开始。默认情况下，PENDING_BYTE 设置得很高，
+ * 以便我们不必为非常大的数据库分配未使用的页面。但是应该通过将 PENDING_BYTE
+ * 设置得较低并运行整个回归测试套件来测试页面跳过逻辑。
  *
- * Changing the value of PENDING_BYTE results in a subtly incompatible
- * file format.  Depending on how it is changed, you might not notice
- * the incompatibility right away, even running a full regression test.
- * The default location of PENDING_BYTE is the first byte past the
- * 1GB boundary.
+ * 更改 PENDING_BYTE 的值会导致微妙的不兼容文件格式。根据其更改方式，
+ * 您可能不会立即注意到不兼容性，即使运行完整的回归测试。
+ * PENDING_BYTE 的默认位置是越过 1GB 边界的第一个字节。
  */
 #define PENDING_BYTE     (0x40000000)
 #define RESERVED_BYTE    (PENDING_BYTE+1)
 #define SHARED_FIRST     (PENDING_BYTE+2)
 #define SHARED_SIZE      510
 /*
- * The default size of a disk sector in bytes.
+ * 磁盘扇区的默认大小（以字节为单位）。
  */
 #ifndef UNQLITE_DEFAULT_SECTOR_SIZE
 #define UNQLITE_DEFAULT_SECTOR_SIZE 512
 #endif
 /*
- * Each open database file is managed by a separate instance
- * of the "Pager" structure.
+ * 每个打开的数据库文件由 "Pager" 结构的单独实例管理。
  */
 typedef struct Pager Pager;
 /*
- * Each database file to be accessed by the system is an instance
- * of the following structure.
+ * 要由系统访问的每个数据库文件都是以下结构的实例。
  */
 struct unqlite_db
 {

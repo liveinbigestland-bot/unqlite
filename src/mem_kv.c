@@ -1,13 +1,12 @@
 /*
- * Symisc unQLite: An Embeddable NoSQL (Post Modern) Database Engine.
- * Copyright (C) 2012-2013, Symisc Systems http://unqlite.org/
- * Version 1.1.6
- * For information on licensing, redistribution of this file, and for a DISCLAIMER OF ALL WARRANTIES
- * please contact Symisc Systems via:
+ * Symisc unQLite: 一个嵌入式 NoSQL（后现代）数据库引擎。
+ * 版权所有 (C) 2012-2013, Symisc Systems http://unqlite.org/
+ * 版本 1.1.6
+ * 有关许可协议、再分发和免责声明的详细信息，请联系 Symisc Systems：
  *       legal@symisc.net
  *       licensing@symisc.net
  *       contact@symisc.net
- * or visit:
+ * 或访问：
  *      http://unqlite.org/licensing.html
  */
  /* $SymiscID: mem_kv.c v1.7 Win7 2012-11-28 01:41 stable <chm@symisc.net> $ */
@@ -15,49 +14,45 @@
 #include "unqliteInt.h"
 #endif
 /* 
- * This file implements an in-memory key value storage engine for unQLite.
- * Note that this storage engine does not support transactions.
+ * 此文件为 unQLite 实现了一个内存键值存储引擎。
+ * 请注意，此存储引擎不支持事务。
  *
- * Normaly, I (chm@symisc.net) planned to implement a red-black tree
- * which is suitable for this kind of operation, but due to the lack
- * of time, I decided to implement a tunned hashtable which everybody
- * know works very well for this kind of operation.
- * Again, I insist on a red-black tree implementation for future version
- * of Unqlite.
+ * 通常，我（chm@symisc.net）计划实现一个红黑树，它非常适合这类操作，
+ * 但由于时间不足，我决定实现一个调优的哈希表，大家都知道这种表在这类操作中效果很好。
+ * 我再次强调，在未来版本的 Unqlite 中实现红黑树。
  */
-/* Forward declaration */
+/* 前向声明 */
 typedef struct mem_hash_kv_engine mem_hash_kv_engine;
 /*
- * Each record is storead in an instance of the following structure.
+ * 每条记录都存储在以下结构的实例中。
  */
 typedef struct mem_hash_record mem_hash_record;
 struct mem_hash_record
 {
-	mem_hash_kv_engine *pEngine;    /* Storage engine */
-	sxu32 nHash;                    /* Hash of the key */
-	const void *pKey;               /* Key */
-	sxu32 nKeyLen;                  /* Key size (Max 1GB) */
-	const void *pData;              /* Data */
-	sxu32 nDataLen;                 /* Data length (Max 4GB) */
-	mem_hash_record *pNext,*pPrev;  /* Link to other records */
-	mem_hash_record *pNextHash,*pPrevHash; /* Collision link */
+	mem_hash_kv_engine *pEngine;    /* 存储引擎 */
+	sxu32 nHash;                    /* 键的哈希 */
+	const void *pKey;               /* 键 */
+	sxu32 nKeyLen;                  /* 键大小（最大 1GB）*/
+	const void *pData;              /* 数据 */
+	sxu32 nDataLen;                 /* 数据长度（最大 4GB）*/
+	mem_hash_record *pNext,*pPrev;  /* 链接到其他记录 */
+	mem_hash_record *pNextHash,*pPrevHash; /* 冲突链接 */
 };
 /*
- * Each in-memory KV engine is represented by an instance
- * of the following structure.
+ * 每个内存 KV 引擎都由以下结构的实例表示。
  */
 struct mem_hash_kv_engine
 {
-	const unqlite_kv_io *pIo; /* IO methods: MUST be first */
-	/* Private data */
-	SyMemBackend sAlloc;        /* Private memory allocator */
-	ProcHash    xHash;          /* Default hash function */
-	ProcCmp     xCmp;           /* Default comparison function */
-	sxu32 nRecord;              /* Total number of records  */
-	sxu32 nBucket;              /* Bucket size: Must be a power of two */
-	mem_hash_record **apBucket; /* Hash bucket */
-	mem_hash_record *pFirst;    /* First inserted entry */
-	mem_hash_record *pLast;     /* Last inserted entry */
+	const unqlite_kv_io *pIo; /* IO 方法：必须是第一个 */
+	/* 私有数据 */
+	SyMemBackend sAlloc;        /* 私有内存分配器 */
+	ProcHash    xHash;          /* 默认哈希函数 */
+	ProcCmp     xCmp;           /* 默认比较函数 */
+	sxu32 nRecord;              /* 记录的总数  */
+	sxu32 nBucket;              /* 桶大小：必须是 2 的幂 */
+	mem_hash_record **apBucket; /* 哈希桶 */
+	mem_hash_record *pFirst;    /* 第一个插入的条目 */
+	mem_hash_record *pLast;     /* 最后一个插入的条目 */
 };
 /*
  * Allocate a new hash record.

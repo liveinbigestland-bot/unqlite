@@ -14,3 +14,7 @@ libunqlite.a
 
 # Build
 *build*
+
+# WorkBuddy / CodeBuddy
+.codebuddy/
+.workbuddy/

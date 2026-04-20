@@ -1,36 +1,35 @@
 /*
- * Symisc JX9: A Highly Efficient Embeddable Scripting Engine Based on JSON.
- * Copyright (C) 2012-2013, Symisc Systems http://jx9.symisc.net/
- * Version 1.7.2
- * For information on licensing, redistribution of this file, and for a DISCLAIMER OF ALL WARRANTIES
- * please contact Symisc Systems via:
+ * Symisc JX9: 一个基于 JSON 的高效嵌入式脚本引擎。
+ * 版权所有 (C) 2012-2013, Symisc Systems http://jx9.symisc.net/
+ * 版本 1.7.2
+ * 有关许可协议、再分发和免责声明的详细信息，请联系 Symisc Systems：
  *       legal@symisc.net
  *       licensing@symisc.net
  *       contact@symisc.net
- * or visit:
+ * 或访问：
  *      http://jx9.symisc.net/
  */
- /* $SymiscID: builtin.c v1.7 Win7 2012-12-13 00:01 stable <chm@symisc.net> $ */
+/* $SymiscID: builtin.c v1.7 Win7 2012-12-13 00:01 stable <chm@symisc.net> $ */
 #ifndef JX9_AMALGAMATION
 #include "jx9Int.h"
 #endif
-/* This file implement built-in 'foreign' functions for the JX9 engine */
+/* 本文件实现了 JX9 引擎的内置"外部"函数 */
 /*
- * Section:
- *    Variable handling Functions.
- * Authors:
+ * 章节:
+ *    变量处理函数。
+ * 作者:
  *    Symisc Systems, devel@symisc.net.
- *    Copyright (C) Symisc Systems, http://jx9.symisc.net
- * Status:
- *    Stable.
+ *    版权所有 (C) Symisc Systems, http://jx9.symisc.net
+ * 状态:
+ *    稳定版。
  */
 /*
  * bool is_bool($var)
- *  Finds out whether a variable is a boolean.
- * Parameters
- *   $var: The variable being evaluated.
- * Return
- *  TRUE if var is a boolean. False otherwise.
+ *  判断变量是否为布尔类型。
+ * 参数
+ *   $var: 被评估的变量。
+ * 返回
+ *  如果 var 是布尔类型则返回 TRUE，否则返回 FALSE。
  */
 static int jx9Builtin_is_bool(jx9_context *pCtx, int nArg, jx9_value **apArg)
 {
@@ -46,11 +45,11 @@ static int jx9Builtin_is_bool(jx9_context *pCtx, int nArg, jx9_value **apArg)
  * bool is_float($var)
  * bool is_real($var)
  * bool is_double($var)
- *  Finds out whether a variable is a float.
- * Parameters
- *   $var: The variable being evaluated.
- * Return
- *  TRUE if var is a float. False otherwise.
+ *  判断变量是否为浮点类型。
+ * 参数
+ *   $var: 被评估的变量。
+ * 返回
+ *  如果 var 是浮点类型则返回 TRUE，否则返回 FALSE。
  */
 static int jx9Builtin_is_float(jx9_context *pCtx, int nArg, jx9_value **apArg)
 {
@@ -66,11 +65,11 @@ static int jx9Builtin_is_float(jx9_context *pCtx, int nArg, jx9_value **apArg)
  * bool is_int($var)
  * bool is_integer($var)
  * bool is_long($var)
- *  Finds out whether a variable is an integer.
- * Parameters
- *   $var: The variable being evaluated.
- * Return
- *  TRUE if var is an integer. False otherwise.
+ *  判断变量是否为整数类型。
+ * 参数
+ *   $var: 被评估的变量。
+ * 返回
+ *  如果 var 是整数类型则返回 TRUE，否则返回 FALSE。
  */
 static int jx9Builtin_is_int(jx9_context *pCtx, int nArg, jx9_value **apArg)
 {
@@ -84,11 +83,11 @@ static int jx9Builtin_is_int(jx9_context *pCtx, int nArg, jx9_value **apArg)
 }
 /*
  * bool is_string($var)
- *  Finds out whether a variable is a string.
- * Parameters
- *   $var: The variable being evaluated.
- * Return
- *  TRUE if var is string. False otherwise.
+ *  判断变量是否为字符串类型。
+ * 参数
+ *   $var: 被评估的变量。
+ * 返回
+ *  如果 var 是字符串类型则返回 TRUE，否则返回 FALSE。
  */
 static int jx9Builtin_is_string(jx9_context *pCtx, int nArg, jx9_value **apArg)
 {
@@ -102,11 +101,11 @@ static int jx9Builtin_is_string(jx9_context *pCtx, int nArg, jx9_value **apArg)
 }
 /*
  * bool is_null($var)
- *  Finds out whether a variable is NULL.
- * Parameters
- *   $var: The variable being evaluated.
- * Return
- *  TRUE if var is NULL. False otherwise.
+ *  判断变量是否为 NULL。
+ * 参数
+ *   $var: 被评估的变量。
+ * 返回
+ *  如果 var 是 NULL 则返回 TRUE，否则返回 FALSE。
  */
 static int jx9Builtin_is_null(jx9_context *pCtx, int nArg, jx9_value **apArg)
 {
@@ -120,11 +119,11 @@ static int jx9Builtin_is_null(jx9_context *pCtx, int nArg, jx9_value **apArg)
 }
 /*
  * bool is_numeric($var)
- *  Find out whether a variable is NULL.
- * Parameters
- *  $var: The variable being evaluated.
- * Return
- *  True if var is numeric. False otherwise.
+ *  判断变量是否为数字类型。
+ * 参数
+ *  $var: 被评估的变量。
+ * 返回
+ *  如果 var 是数字类型则返回 TRUE，否则返回 FALSE。
  */
 static int jx9Builtin_is_numeric(jx9_context *pCtx, int nArg, jx9_value **apArg)
 {
@@ -138,11 +137,11 @@ static int jx9Builtin_is_numeric(jx9_context *pCtx, int nArg, jx9_value **apArg)
 }
 /*
  * bool is_scalar($var)
- *  Find out whether a variable is a scalar.
- * Parameters
- *  $var: The variable being evaluated.
- * Return
- *  True if var is scalar. False otherwise.
+ *  判断变量是否为标量类型。
+ * 参数
+ *  $var: 被评估的变量。
+ * 返回
+ *  如果 var 是标量则返回 TRUE，否则返回 FALSE。
  */
 static int jx9Builtin_is_scalar(jx9_context *pCtx, int nArg, jx9_value **apArg)
 {
@@ -156,11 +155,11 @@ static int jx9Builtin_is_scalar(jx9_context *pCtx, int nArg, jx9_value **apArg)
 }
 /*
  * bool is_array($var)
- *  Find out whether a variable is an array.
- * Parameters
- *  $var: The variable being evaluated.
- * Return
- *  True if var is an array. False otherwise.
+ *  判断变量是否为数组类型。
+ * 参数
+ *  $var: 被评估的变量。
+ * 返回
+ *  如果 var 是数组则返回 TRUE，否则返回 FALSE。
  */
 static int jx9Builtin_is_array(jx9_context *pCtx, int nArg, jx9_value **apArg)
 {
@@ -174,11 +173,11 @@ static int jx9Builtin_is_array(jx9_context *pCtx, int nArg, jx9_value **apArg)
 }
 /*
  * bool is_object($var)
- *  Find out whether a variable is an object.
- * Parameters
- *  $var: The variable being evaluated.
- * Return
- *  True if var is an object. False otherwise.
+ *  判断变量是否为一个对象。
+ * 参数
+ *  $var: 被评估的变量。
+ * 返回
+ *  如果 var 是对象则返回 TRUE，否则返回 FALSE。
  */
 static int jx9Builtin_is_object(jx9_context *pCtx, int nArg, jx9_value **apArg)
 {
@@ -192,11 +191,11 @@ static int jx9Builtin_is_object(jx9_context *pCtx, int nArg, jx9_value **apArg)
 }
 /*
  * bool is_resource($var)
- *  Find out whether a variable is a resource.
- * Parameters
- *  $var: The variable being evaluated.
- * Return
- *  True if a resource. False otherwise.
+ *  判断变量是否为资源类型。
+ * 参数
+ *  $var: 被评估的变量。
+ * 返回
+ *  如果是资源则返回 TRUE，否则返回 FALSE。
  */
 static int jx9Builtin_is_resource(jx9_context *pCtx, int nArg, jx9_value **apArg)
 {
@@ -209,11 +208,11 @@ static int jx9Builtin_is_resource(jx9_context *pCtx, int nArg, jx9_value **apArg
 }
 /*
  * float floatval($var)
- *  Get float value of a variable.
- * Parameter
- *  $var: The variable being processed.
- * Return
- *  the float value of a variable.
+ *  获取变量的浮点值。
+ * 参数
+ *  $var: 被处理的变量。
+ * 返回
+ *  变量的浮点值。
  */
 static int jx9Builtin_floatval(jx9_context *pCtx, int nArg, jx9_value **apArg)
 {
@@ -230,11 +229,11 @@ static int jx9Builtin_floatval(jx9_context *pCtx, int nArg, jx9_value **apArg)
 }
 /*
  * int intval($var)
- *  Get integer value of a variable.
- * Parameter
- *  $var: The variable being processed.
- * Return
- *  the int value of a variable.
+ *  获取变量的整数值。
+ * 参数
+ *  $var: 被处理的变量。
+ * 返回
+ *  变量的整数值。
  */
 static int jx9Builtin_intval(jx9_context *pCtx, int nArg, jx9_value **apArg)
 {
@@ -293,7 +292,7 @@ static int jx9Builtin_empty(jx9_context *pCtx, int nArg, jx9_value **apArg)
 #ifdef JX9_ENABLE_MATH_FUNC
 /*
  * Section:
- *    Math Functions.
+ *    数学函数。
  * Authors:
  *    Symisc Systems, devel@symisc.net.
  *    Copyright (C) Symisc Systems, http://jx9.symisc.net
@@ -327,11 +326,11 @@ static int jx9Builtin_sqrt(jx9_context *pCtx, int nArg, jx9_value **apArg)
 }
 /*
  * float exp(float $arg )
- *  Calculates the exponent of e.
- * Parameter
- *  The number to process.
- * Return
- *  'e' raised to the power of arg.
+ *  计算 e 的指数。
+ * 参数
+ *  要处理的数字。
+ * 返回
+ *  'e' 的 arg 次幂。
  */
 static int jx9Builtin_exp(jx9_context *pCtx, int nArg, jx9_value **apArg)
 {
@@ -350,7 +349,7 @@ static int jx9Builtin_exp(jx9_context *pCtx, int nArg, jx9_value **apArg)
 }
 /*
  * float floor(float $arg )
- *  Round fractions down.
+ *  向下取整。
  * Parameter
  *  The number to process.
  * Return
@@ -419,11 +418,11 @@ static int jx9Builtin_acos(jx9_context *pCtx, int nArg, jx9_value **apArg)
 }
 /*
  * float cosh(float $arg )
- *  Hyperbolic cosine.
- * Parameter
- *  The number to process.
- * Return
- *  The hyperbolic cosine of arg.
+ *  双曲余弦。
+ * 参数
+ *  要处理的数字。
+ * 返回
+ *  arg 的双曲余弦值。
  */
 static int jx9Builtin_cosh(jx9_context *pCtx, int nArg, jx9_value **apArg)
 {
@@ -511,11 +510,11 @@ static int jx9Builtin_sinh(jx9_context *pCtx, int nArg, jx9_value **apArg)
 }
 /*
  * float ceil(float $arg )
- *  Round fractions up.
- * Parameter
- *  The number to process.
- * Return
- *  The next highest integer value by rounding up value if necessary.
+ *  向上取整。
+ * 参数
+ *  要处理的数字。
+ * 返回
+ *  必要时返回向上舍入的后一个最高整数值。
  */
 static int jx9Builtin_ceil(jx9_context *pCtx, int nArg, jx9_value **apArg)
 {
@@ -580,11 +579,11 @@ static int jx9Builtin_atan(jx9_context *pCtx, int nArg, jx9_value **apArg)
 }
 /*
  * float tanh(float $arg )
- *  Hyperbolic tangent.
- * Parameter
- *  The number to process.
- * Return
- *  The Hyperbolic tangent of arg.
+ *  双曲正切。
+ * 参数
+ *  要处理的数字。
+ * 返回
+ *  arg 的双曲正切值。
  */
 static int jx9Builtin_tanh(jx9_context *pCtx, int nArg, jx9_value **apArg)
 {
@@ -603,12 +602,12 @@ static int jx9Builtin_tanh(jx9_context *pCtx, int nArg, jx9_value **apArg)
 }
 /*
  * float atan2(float $y, float $x)
- *  Arc tangent of two variable.
- * Parameter
- *  $y = Dividend parameter.
- *  $x = Divisor parameter.
- * Return
- *  The arc tangent of y/x in radian.
+ *  两个变量的反正切。
+ * 参数
+ *  $y = 被除数参数。
+ *  $x = 除数参数。
+ * 返回
+ *  y/x 的反正切值（弧度）。
  */
 static int jx9Builtin_atan2(jx9_context *pCtx, int nArg, jx9_value **apArg)
 {
@@ -628,11 +627,11 @@ static int jx9Builtin_atan2(jx9_context *pCtx, int nArg, jx9_value **apArg)
 }
 /*
  * float/int64 abs(float/int64 $arg )
- *  Absolute value.
- * Parameter
- *  The number to process.
- * Return
- *  The absolute value of number.
+ *  绝对值。
+ * 参数
+ *  要处理的数字。
+ * 返回
+ *  数字的绝对值。
  */
 static int jx9Builtin_abs(jx9_context *pCtx, int nArg, jx9_value **apArg)
 {
@@ -660,14 +659,14 @@ static int jx9Builtin_abs(jx9_context *pCtx, int nArg, jx9_value **apArg)
 }
 /*
  * float log(float $arg, [int/float $base])
- *  Natural logarithm.
- * Parameter
- *  $arg: The number to process.
- *  $base: The optional logarithmic base to use. (only base-10 is supported)
- * Return
- *  The logarithm of arg to base, if given, or the natural logarithm.
- * Note: 
- *  only Natural log and base-10 log are supported. 
+ *  自然对数。
+ * 参数
+ *  $arg: 要处理的数字。
+ *  $base: 可选的对数底。（仅支持底为10）
+ * 返回
+ *  如果给定了底数，则返回 arg 的对数值，否则返回自然对数。
+ * 注意:
+ *  仅支持自然对数和以10为底的对数。
  */
 static int jx9Builtin_log(jx9_context *pCtx, int nArg, jx9_value **apArg)
 {
@@ -691,11 +690,11 @@ static int jx9Builtin_log(jx9_context *pCtx, int nArg, jx9_value **apArg)
 }
 /*
  * float log10(float $arg )
- *  Base-10 logarithm.
- * Parameter
- *  The number to process.
- * Return
- *  The Base-10 logarithm of the given number.
+ *  以10为底的对数。
+ * 参数
+ *  要处理的数字。
+ * 返回
+ *  给定数的以10为底的对数。
  */
 static int jx9Builtin_log10(jx9_context *pCtx, int nArg, jx9_value **apArg)
 {
@@ -714,16 +713,16 @@ static int jx9Builtin_log10(jx9_context *pCtx, int nArg, jx9_value **apArg)
 }
 /*
  * number pow(number $base, number $exp)
- *  Exponential expression.
- * Parameter
+ *  幂运算。
+ * 参数
  *  base
- *  The base to use.
+ *  底数。
  * exp
- *  The exponent.
- * Return
- *  base raised to the power of exp.
- *  If the result can be represented as integer it will be returned
- *  as type integer, else it will be returned as type float. 
+ *  指数。
+ * 返回
+ *  base 的 exp 次幂。
+ *  如果结果可以表示为整数，则以整数类型返回，
+ *  否则以浮点类型返回。
  */
 static int jx9Builtin_pow(jx9_context *pCtx, int nArg, jx9_value **apArg)
 {
@@ -742,11 +741,11 @@ static int jx9Builtin_pow(jx9_context *pCtx, int nArg, jx9_value **apArg)
 }
 /*
  * float pi(void)
- *  Returns an approximation of pi. 
- * Note
- *  you can use the M_PI constant which yields identical results to pi(). 
- * Return
- *  The value of pi as float.
+ *  返回圆周率的近似值。
+ * 注意
+ *  你可以使用 M_PI 常量，它会产生与 pi() 相同的结果。
+ * 返回
+ *  圆周率的浮点值。
  */
 static int jx9Builtin_pi(jx9_context *pCtx, int nArg, jx9_value **apArg)
 {
@@ -757,14 +756,14 @@ static int jx9Builtin_pi(jx9_context *pCtx, int nArg, jx9_value **apArg)
 }
 /*
  * float fmod(float $x, float $y)
- *  Returns the floating point remainder (modulo) of the division of the arguments. 
- * Parameters
+ *  返回除法运算的浮点余数（模）。
+ * 参数
  * $x
- *  The dividend
+ *  被除数
  * $y
- *  The divisor
- * Return
- *  The floating point remainder of x/y.
+ *  除数
+ * 返回
+ *  x/y 的浮点余数。
  */
 static int jx9Builtin_fmod(jx9_context *pCtx, int nArg, jx9_value **apArg)
 {
@@ -785,14 +784,14 @@ static int jx9Builtin_fmod(jx9_context *pCtx, int nArg, jx9_value **apArg)
 }
 /*
  * float hypot(float $x, float $y)
- *  Calculate the length of the hypotenuse of a right-angle triangle . 
- * Parameters
+ *  计算直角三角形斜边的长度。
+ * 参数
  * $x
- *  Length of first side
+ *  第一条边的长度
  * $y
- *  Length of first side
- * Return
- *  Calculated length of the hypotenuse.
+ *  第二条边的长度
+ * 返回
+ *  斜边的计算长度。
  */
 static int jx9Builtin_hypot(jx9_context *pCtx, int nArg, jx9_value **apArg)
 {
@@ -989,12 +988,12 @@ static int jx9Builtin_hexdec(jx9_context *pCtx, int nArg, jx9_value **apArg)
 }
 /*
  * int64 bindec(string $bin_string)
- *  Binary to decimal.
- * Parameters
+ *  二进制转换为十进制。
+ * 参数
  *  $bin_string
- *   The binary string to convert
- * Return
- *  Returns the decimal equivalent of the binary number represented by the binary_string argument.  
+ *   要转换的二进制字符串
+ * 返回
+ *  返回由 binary_string 参数表示的二进制数的十进制等价物。
  */
 static int jx9Builtin_bindec(jx9_context *pCtx, int nArg, jx9_value **apArg)
 {
@@ -1024,12 +1023,12 @@ static int jx9Builtin_bindec(jx9_context *pCtx, int nArg, jx9_value **apArg)
 }
 /*
  * int64 octdec(string $oct_string)
- *  Octal to decimal.
- * Parameters
+ *  八进制转换为十进制。
+ * 参数
  *  $oct_string
- *   The octal string to convert
- * Return
- *  Returns the decimal equivalent of the octal number represented by the octal_string argument.  
+ *   要转换的八进制字符串
+ * 返回
+ *  返回由 octal_string 参数表示的八进制数的十进制等价物。
  */
 static int jx9Builtin_octdec(jx9_context *pCtx, int nArg, jx9_value **apArg)
 {
@@ -1846,11 +1845,11 @@ static int jx9Builtin_html_entity_decode(jx9_context *pCtx, int nArg, jx9_value 
 }
 /*
  * int strlen($string)
- *  return the length of the given string.
- * Parameter
- *  string: The string being measured for length.
- * Return
- *  length of the given string.
+ *  返回给定字符串的长度。
+ * 参数
+ *  string: 要测量长度的字符串。
+ * 返回
+ *  给定字符串的长度。
  */
 static int jx9Builtin_strlen(jx9_context *pCtx, int nArg, jx9_value **apArg)
 {
@@ -1926,13 +1925,12 @@ static int jx9Builtin_strncmp(jx9_context *pCtx, int nArg, jx9_value **apArg)
 }
 /*
  * int strcasecmp(string $str1, string $str2, int n)
- *  Perform a binary safe case-insensitive string comparison.
- * Parameter
- *  str1: The first string
- *  str2: The second string
- * Return
- *  Returns < 0 if str1 is less than str2; > 0 if str1 is greater 
- *  than str2, and 0 if they are equal.
+ *  执行二进制安全的不区分大小写的字符串比较。
+ * 参数
+ *  str1: 第一个字符串
+ *  str2: 第二个字符串
+ * 返回
+ *  如果 str1 小于 str2 则返回 < 0；如果 str1 大于 str2 则返回 > 0；如果相等则返回 0。
  */
 static int jx9Builtin_strcasecmp(jx9_context *pCtx, int nArg, jx9_value **apArg)
 {

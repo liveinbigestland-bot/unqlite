@@ -1,30 +1,29 @@
 /*
- * Symisc unQLite: An Embeddable NoSQL (Post Modern) Database Engine.
- * Copyright (C) 2012-2013, Symisc Systems http://unqlite.org/
- * Version 1.1.6
- * For information on licensing, redistribution of this file, and for a DISCLAIMER OF ALL WARRANTIES
- * please contact Symisc Systems via:
+ * Symisc unQLite: 一个嵌入式 NoSQL（后现代）数据库引擎。
+ * 版权所有 (C) 2012-2013, Symisc Systems http://unqlite.org/
+ * 版本 1.1.6
+ * 有关许可协议、再分发和免责声明的详细信息，请联系 Symisc Systems：
  *       legal@symisc.net
  *       licensing@symisc.net
  *       contact@symisc.net
- * or visit:
+ * 或访问：
  *      http://unqlite.org/licensing.html
  */
- /* $SymiscID: unql_jx9.c v1.2 FreeBSD 2013-01-24 22:45 stable <chm@symisc.net> $ */
+/* $SymiscID: unql_jx9.c v1.2 FreeBSD 2013-01-24 22:45 stable <chm@symisc.net> $ */
 #ifndef UNQLITE_AMALGAMATION
 #include "unqliteInt.h"
 #endif
-/* 
- * This file implements UnQLite functions (db_exists(), db_create(), db_put(), db_get(), etc.) for the
- * underlying Jx9 Virtual Machine. 
+/*
+ * 本文件为底层 Jx9 虚拟机实现了 UnQLite 函数
+ * (db_exists()、db_create()、db_put()、db_get() 等)。
  */
 /*
  * string db_version(void)
- *   Return the current version of the unQLite database engine.
- * Parameter
- *   None
- * Return
- *    unQLite version number (string).
+ *   返回当前版本的 unQLite 数据库引擎。
+ * 参数
+ *   无
+ * 返回
+ *    unQLite 版本号（字符串）。
  */
 static int unqliteBuiltin_db_version(jx9_context *pCtx,int argc,jx9_value **argv)
 {
@@ -35,11 +34,11 @@ static int unqliteBuiltin_db_version(jx9_context *pCtx,int argc,jx9_value **argv
 }
 /*
  * string db_errlog(void)
- *   Return the database error log.
- * Parameter
- *   None
- * Return
- *    Database error log (string).
+ *   返回数据库错误日志。
+ * 参数
+ *   无
+ * 返回
+ *    数据库错误日志（字符串）。
  */
 static int unqliteBuiltin_db_errlog(jx9_context *pCtx,int argc,jx9_value **argv)
 {
@@ -59,11 +58,11 @@ static int unqliteBuiltin_db_errlog(jx9_context *pCtx,int argc,jx9_value **argv)
 /*
  * string db_copyright(void)
  * string db_credits(void)
- *   Return the unQLite database engine copyright notice.
- * Parameter
- *   None
- * Return
- *    Copyright notice.
+ *   返回 unQLite 数据库引擎的版权声明。
+ * 参数
+ *   无
+ * 返回
+ *    版权声明。
  */
 static int unqliteBuiltin_db_credits(jx9_context *pCtx,int argc,jx9_value **argv)
 {
@@ -74,11 +73,11 @@ static int unqliteBuiltin_db_credits(jx9_context *pCtx,int argc,jx9_value **argv
 }
 /*
  * string db_sig(void)
- *   Return the unQLite database engine unique signature.
- * Parameter
- *   None
- * Return
- *    unQLite signature.
+ *   返回 unQLite 数据库引擎的唯一签名。
+ * 参数
+ *   无
+ * 返回
+ *    unQLite 签名。
  */
 static int unqliteBuiltin_db_sig(jx9_context *pCtx,int argc,jx9_value **argv)
 {
@@ -90,11 +89,11 @@ static int unqliteBuiltin_db_sig(jx9_context *pCtx,int argc,jx9_value **argv)
 /*
  * bool collection_exists(string $name)
  * bool db_exits(string $name)
- *   Check if a given collection exists in the underlying database.
- * Parameter
- *   name: Lookup name
- * Return
- *    TRUE if the collection exits. FALSE otherwise.
+ *   检查底层数据库中是否存在给定集合。
+ * 参数
+ *   name: 查找名称
+ * 返回
+ *    如果集合存在则返回 TRUE，否则返回 FALSE。
  */
 static int unqliteBuiltin_collection_exists(jx9_context *pCtx,int argc,jx9_value **argv)
 {
