@@ -1,0 +1,103 @@
+name: CI
+
+on:
+  push:
+    branches: [master, develop]
+  pull_request:
+    branches: [master, develop]
+
+jobs:
+  build-linux:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        compiler: [gcc, clang]
+        build_type: [Debug, Release]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: sudo apt-get update && sudo apt-get install -y cmake build-essential clang
+
+      - name: Configure (GCC)
+        if: matrix.compiler == 'gcc'
+        run: |
+          mkdir build && cd build
+          cmake .. -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
+                   -DBUILD_TESTING=ON \
+                   -DENABLE_SANITIZERS=${{ matrix.build_type == 'Debug' && 'ON' || 'OFF' }} \
+                   -DCMAKE_C_COMPILER=gcc
+
+      - name: Configure (Clang)
+        if: matrix.compiler == 'clang'
+        run: |
+          mkdir build && cd build
+          cmake .. -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
+                   -DBUILD_TESTING=ON \
+                   -DENABLE_SANITIZERS=${{ matrix.build_type == 'Debug' && 'ON' || 'OFF' }} \
+                   -DCMAKE_C_COMPILER=clang
+
+      - name: Build
+        run: cd build && cmake --build . --config ${{ matrix.build_type }} -j$(nproc)
+
+      - name: Test
+        working-directory: build
+        run: ctest --output-on-failure -C ${{ matrix.build_type }}
+
+  build-windows:
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        build_type: [Debug, Release]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure
+        run: |
+          mkdir build
+          cd build
+          cmake .. -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} -DBUILD_TESTING=ON
+
+      - name: Build
+        run: cd build && cmake --build . --config ${{ matrix.build_type }}
+
+      - name: Test
+        working-directory: build
+        run: ctest --output-on-failure -C ${{ matrix.build_type }}
+
+  build-macos:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure
+        run: |
+          mkdir build && cd build
+          cmake .. -DCMAKE_BUILD_TYPE=Debug \
+                   -DBUILD_TESTING=ON \
+                   -DENABLE_SANITIZERS=ON
+
+      - name: Build
+        run: cd build && cmake --build . -j$(sysctl -n hw.ncpu)
+
+      - name: Test
+        working-directory: build
+        run: ctest --output-on-failure
+
+  static-analysis:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install cppcheck
+        run: sudo apt-get update && sudo apt-get install -y cppcheck
+
+      - name: Run cppcheck
+        run: |
+          cppcheck --enable=all --suppress=missingInclude \
+            --suppress=unusedFunction \
+            --language=c \
+            --std=c99 \
+            --error-exitcode=1 \
+            -I src \
+            src/ 2>&1 || true
